@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ExternalLink, Download, Copy, Check, FileText, Loader2, Printer } from 'lucide-react';
 import { OfficialDocumentViewer } from './OfficialDocumentViewer';
-import { downloadOfficialDocument, PTS_SGI_009_DATA } from '../data/officialDocumentContent';
+import { 
+  downloadOfficialDocument, 
+  PTS_SGI_009_DATA, 
+  downloadTpvDocument, 
+  TPV_CARGA_SUELTA_DATA 
+} from '../data/officialDocumentContent';
 
 interface PreviewModalProps {
   url: string | null;
@@ -17,9 +22,14 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const isTpvDoc = 
+    Boolean(code && (code.includes('POP-ALP-TPV') || code.includes('ALP-TPV'))) ||
+    Boolean(url && (url.includes('pop-alp-tpv') || url.includes('doc-pop-alp-tpv')));
+
   const isInternalDoc = 
     Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009'))) ||
-    Boolean(url && (url.includes('pts-sgi-009') || url.startsWith('#doc-')));
+    Boolean(url && (url.includes('pts-sgi-009') || url.startsWith('#doc-'))) ||
+    isTpvDoc;
 
   useEffect(() => {
     setIsLoading(true);
@@ -47,7 +57,11 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   };
 
   const handleCopyLink = () => {
-    if (isInternalDoc) {
+    if (isTpvDoc) {
+      navigator.clipboard.writeText(`${window.location.origin}/#pop-alp-tpv`);
+      setCopied(true);
+      onToast('Enlace de procedimiento copiado al portapapeles');
+    } else if (isInternalDoc) {
       navigator.clipboard.writeText(`${window.location.origin}/#pts-sgi-009`);
       setCopied(true);
       onToast('Enlace de procedimiento copiado al portapapeles');
@@ -60,7 +74,11 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   };
 
   const handleDownloadInternal = (e: React.MouseEvent) => {
-    if (isInternalDoc) {
+    if (isTpvDoc) {
+      e.preventDefault();
+      downloadTpvDocument(TPV_CARGA_SUELTA_DATA);
+      onToast('Descargando procedimiento oficial Despacho Carga Suelta TPV');
+    } else if (isInternalDoc) {
       e.preventDefault();
       downloadOfficialDocument(PTS_SGI_009_DATA);
       onToast('Descargando documento oficial PTS-SGI-009');
@@ -184,7 +202,7 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
           {/* Document Content */}
           <div className="relative flex-1 bg-slate-100 overflow-hidden flex flex-col">
             {isInternalDoc ? (
-              <OfficialDocumentViewer onToast={onToast} />
+              <OfficialDocumentViewer docCode={code} docUrl={url} onToast={onToast} />
             ) : (
               <>
                 {isLoading && (

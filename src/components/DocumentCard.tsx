@@ -18,7 +18,12 @@ import {
   Layers
 } from 'lucide-react';
 import { DocumentItem } from '../types';
-import { downloadOfficialDocument, PTS_SGI_009_DATA } from '../data/officialDocumentContent';
+import { 
+  downloadOfficialDocument, 
+  PTS_SGI_009_DATA, 
+  downloadTpvDocument, 
+  TPV_CARGA_SUELTA_DATA 
+} from '../data/officialDocumentContent';
 
 interface DocumentCardProps {
   key?: string | number;
@@ -63,8 +68,13 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
   const handleDownload = (e: React.MouseEvent) => {
     if (isInternal) {
       e.preventDefault();
-      downloadOfficialDocument(PTS_SGI_009_DATA);
-      onToast(`Descargando documento oficial: ${item.title}`);
+      if (item.code?.includes('POP-ALP-TPV') || item.pdfUrl?.includes('pop-alp-tpv')) {
+        downloadTpvDocument(TPV_CARGA_SUELTA_DATA);
+        onToast(`Descargando procedimiento oficial: ${item.title}`);
+      } else {
+        downloadOfficialDocument(PTS_SGI_009_DATA);
+        onToast(`Descargando documento oficial: ${item.title}`);
+      }
     }
   };
 
