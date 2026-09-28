@@ -111,8 +111,12 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
           {/* Executive Header */}
           <div className="px-5 py-4 bg-gradient-to-r from-[#00264A] to-[#003B6F] text-white flex items-center justify-between gap-4 shrink-0 border-b border-sky-900/40">
             <div className="flex items-center gap-3.5 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-sky-200 shrink-0">
-                <FileText className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-sky-200 shrink-0 overflow-hidden p-1">
+                {isTpvDoc ? (
+                  <img src="/logo-saco.svg" alt="Saco Carga Suelta" className="w-7 h-7 object-contain" />
+                ) : (
+                  <FileText className="w-5 h-5" />
+                )}
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">

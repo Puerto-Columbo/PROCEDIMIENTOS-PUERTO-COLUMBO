@@ -143,9 +143,28 @@ export function OfficialDocumentViewer({ docCode, docUrl, onToast }: OfficialDoc
               {(currentPage === 'all' || currentPage === 1) && (
                 <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-12 min-h-[920px] flex flex-col justify-between text-slate-900 relative">
                   <div className="space-y-4">
-                    {/* Header institucional */}
-                    <div className="text-center font-bold text-xs sm:text-sm text-slate-800 border-b-2 border-[#003B6F] pb-2 mb-4 tracking-wide uppercase">
-                      {tpvData.headerCompany} | {tpvData.headerCategory}
+                    {/* Header institucional con Logo del Saco */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between border-b-2 border-[#003B6F] pb-3 mb-4 gap-3">
+                      <div className="flex items-center gap-3">
+                        <img 
+                          src="/logo-saco.svg" 
+                          alt="Logo Saco - Carga Suelta" 
+                          className="h-12 w-auto object-contain shrink-0"
+                        />
+                        <div className="text-left">
+                          <div className="font-bold text-xs sm:text-sm text-slate-900 tracking-wide uppercase">
+                            {tpvData.headerCompany}
+                          </div>
+                          <div className="text-[11px] font-semibold text-[#003B6F] tracking-wide uppercase">
+                            {tpvData.headerCategory}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="px-2.5 py-1 text-[11px] font-mono font-bold bg-amber-50 text-amber-900 border border-amber-300 rounded-sm">
+                          {tpvData.code}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="mb-4">
