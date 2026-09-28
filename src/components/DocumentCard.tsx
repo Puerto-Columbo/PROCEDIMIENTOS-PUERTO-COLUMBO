@@ -18,12 +18,7 @@ import {
   Layers
 } from 'lucide-react';
 import { DocumentItem } from '../types';
-import { 
-  downloadOfficialDocument, 
-  PTS_SGI_009_DATA, 
-  downloadTpvDocument, 
-  TPV_CARGA_SUELTA_DATA 
-} from '../data/officialDocumentContent';
+import { downloadOfficialDocument, PTS_SGI_009_DATA } from '../data/officialDocumentContent';
 
 interface DocumentCardProps {
   key?: string | number;
@@ -68,23 +63,12 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
   const handleDownload = (e: React.MouseEvent) => {
     if (isInternal) {
       e.preventDefault();
-      if (item.code?.includes('POP-ALP-TPV') || item.pdfUrl?.includes('pop-alp-tpv')) {
-        downloadTpvDocument(TPV_CARGA_SUELTA_DATA);
-        onToast(`Descargando procedimiento oficial: ${item.title}`);
-      } else {
-        downloadOfficialDocument(PTS_SGI_009_DATA);
-        onToast(`Descargando documento oficial: ${item.title}`);
-      }
+      downloadOfficialDocument(PTS_SGI_009_DATA);
+      onToast(`Descargando documento oficial: ${item.title}`);
     }
   };
 
   const formatTag = item.fileType?.toUpperCase() || (item.pdfUrl?.includes('docx') ? 'DOCX' : 'PDF');
-
-  const isCargaSuelta = Boolean(
-    item.code?.includes('POP-ALP-TPV') ||
-    item.title?.toLowerCase().includes('carga suelta') ||
-    item.pdfUrl?.includes('pop-alp-tpv')
-  );
 
   return (
     <motion.div
@@ -102,16 +86,8 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
           {/* Main Info */}
           <div className="flex items-start gap-4 flex-1 min-w-0">
             {/* Department Icon Box */}
-            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-center text-[#003B6F] group-hover:bg-[#003B6F] group-hover:text-white transition-colors duration-200 shrink-0 shadow-2xs overflow-hidden p-1.5">
-              {isCargaSuelta ? (
-                <img 
-                  src="/logo-saco.svg" 
-                  alt="Saco Carga Suelta" 
-                  className="w-8 h-8 object-contain transition-transform group-hover:scale-110"
-                />
-              ) : (
-                <IconComponent className="w-6 h-6" />
-              )}
+            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-center text-[#003B6F] group-hover:bg-[#003B6F] group-hover:text-white transition-colors duration-200 shrink-0 shadow-2xs">
+              <IconComponent className="w-6 h-6" />
             </div>
 
             <div className="flex-1 min-w-0">

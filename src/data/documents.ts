@@ -177,29 +177,6 @@ export const proceduresData: DocumentItem[] = [
     ],
     pdfUrl: "#doc-pts-sgi-009"
   },
-  { 
-    id: "proc-11", 
-    code: "POP-ALP-TPV",
-    title: "Despacho Carga Suelta TPV - Anexo Almacén Patio", 
-    category: "Almacén Patio", 
-    date: "Actualizado • Procedimiento Operacional", 
-    type: "procedure",
-    fileType: "pdf",
-    description: "Establecer el procedimiento operativo y documental para realizar el despacho de carga suelta desde TPV hacia Puerto Columbo, definiendo las actividades que debe ejecutar el personal de Almacén Patio desde su llegada al terminal hasta la autorización de salida del transporte.",
-    steps: [
-      "5.2.1 Citación de la carga suelta: Previo al retiro de la carga, TPV realiza la citación correspondiente para la carga suelta. Al llegar al terminal, dirigirse directamente a Control Documentos o Control Transporte para informar presencia y dar inicio a gestiones.",
-      "5.2.2 Presentación en Control Documentos o Control Transporte: Identificarse como personal de Puerto Columbo e informar la cantidad de carga a despachar. Permanecer y esperar a que TPV gestione la citación y entregue las dos hojas correspondientes.",
-      "5.2.3 Verificación de disponibilidad de camiones: Verificar si los camiones destinados al traslado están disponibles. Si no lo están, solicitarlos directamente en Operaciones TPV.",
-      "5.2.4 Carga del primer camión y recepción de antecedentes: Cargado el primer camión, TPV entrega hoja con antecedentes (BL, cantidad de carga, peso, patente del camión) para confeccionar las Guías.",
-      "5.2.5 Confección de Guías de Puerto Columbo: Completar cuatro (4) Guías de Puerto Columbo sin cometer errores (una guía incorrecta debe rehacerse); verificar coincidencia de BL, cantidad, peso y patente.",
-      "5.2.6 Timbrado en Control Documentos: Presentar la hoja de TPV y las cuatro Guías de Puerto Columbo en Control Documentos para revisión y timbrado.",
-      "5.2.7 Gestión documental en Aduana: Presentar las guías indicando expresamente 'Traslado de zona primaria hacia Puerto Columbo'. Aduana timbra y retiene una (1) guía.",
-      "5.2.8 Autorización de salida en Control Documentos: Presentar guías timbradas por Aduana en Control Documentos; se autoriza salida, timbran, retienen una (1) guía y entregan hoja termolaminada.",
-      "5.2.9 Entrega de documentación al chofer: Entregar al conductor la hoja termolaminada y las Guías correspondientes para realizar el INTERCHANGE.",
-      "5.2.10 Salida de TPV: El conductor realiza el INTERCHANGE y validaciones documentales, quedando autorizado a salir hacia Puerto Columbo, finalizando el despacho."
-    ],
-    pdfUrl: "#doc-pop-alp-tpv"
-  },
 ];
 
 export const checklistsData: DocumentItem[] = [

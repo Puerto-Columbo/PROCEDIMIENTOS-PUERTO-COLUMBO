@@ -2,12 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ExternalLink, Download, Copy, Check, FileText, Loader2, Printer } from 'lucide-react';
 import { OfficialDocumentViewer } from './OfficialDocumentViewer';
-import { 
-  downloadOfficialDocument, 
-  PTS_SGI_009_DATA, 
-  downloadTpvDocument, 
-  TPV_CARGA_SUELTA_DATA 
-} from '../data/officialDocumentContent';
+import { downloadOfficialDocument, PTS_SGI_009_DATA } from '../data/officialDocumentContent';
 
 interface PreviewModalProps {
   url: string | null;
@@ -22,14 +17,9 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const isTpvDoc = 
-    Boolean(code && (code.includes('POP-ALP-TPV') || code.includes('ALP-TPV'))) ||
-    Boolean(url && (url.includes('pop-alp-tpv') || url.includes('doc-pop-alp-tpv')));
-
   const isInternalDoc = 
     Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009'))) ||
-    Boolean(url && (url.includes('pts-sgi-009') || url.startsWith('#doc-'))) ||
-    isTpvDoc;
+    Boolean(url && (url.includes('pts-sgi-009') || url.startsWith('#doc-')));
 
   useEffect(() => {
     setIsLoading(true);
@@ -57,11 +47,7 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   };
 
   const handleCopyLink = () => {
-    if (isTpvDoc) {
-      navigator.clipboard.writeText(`${window.location.origin}/#pop-alp-tpv`);
-      setCopied(true);
-      onToast('Enlace de procedimiento copiado al portapapeles');
-    } else if (isInternalDoc) {
+    if (isInternalDoc) {
       navigator.clipboard.writeText(`${window.location.origin}/#pts-sgi-009`);
       setCopied(true);
       onToast('Enlace de procedimiento copiado al portapapeles');
@@ -74,11 +60,7 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   };
 
   const handleDownloadInternal = (e: React.MouseEvent) => {
-    if (isTpvDoc) {
-      e.preventDefault();
-      downloadTpvDocument(TPV_CARGA_SUELTA_DATA);
-      onToast('Descargando procedimiento oficial Despacho Carga Suelta TPV');
-    } else if (isInternalDoc) {
+    if (isInternalDoc) {
       e.preventDefault();
       downloadOfficialDocument(PTS_SGI_009_DATA);
       onToast('Descargando documento oficial PTS-SGI-009');
@@ -111,12 +93,8 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
           {/* Executive Header */}
           <div className="px-5 py-4 bg-gradient-to-r from-[#00264A] to-[#003B6F] text-white flex items-center justify-between gap-4 shrink-0 border-b border-sky-900/40">
             <div className="flex items-center gap-3.5 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-sky-200 shrink-0 overflow-hidden p-1">
-                {isTpvDoc ? (
-                  <img src="/logo-saco.svg" alt="Saco Carga Suelta" className="w-7 h-7 object-contain" />
-                ) : (
-                  <FileText className="w-5 h-5" />
-                )}
+              <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-sky-200 shrink-0">
+                <FileText className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -206,7 +184,7 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
           {/* Document Content */}
           <div className="relative flex-1 bg-slate-100 overflow-hidden flex flex-col">
             {isInternalDoc ? (
-              <OfficialDocumentViewer docCode={code} docUrl={url} onToast={onToast} />
+              <OfficialDocumentViewer onToast={onToast} />
             ) : (
               <>
                 {isLoading && (

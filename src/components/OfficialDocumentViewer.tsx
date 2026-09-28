@@ -11,44 +11,24 @@ import {
   ZoomIn,
   ZoomOut
 } from 'lucide-react';
-import { 
-  PTS_SGI_009_DATA, 
-  downloadOfficialDocument, 
-  TPV_CARGA_SUELTA_DATA, 
-  downloadTpvDocument 
-} from '../data/officialDocumentContent';
+import { PTS_SGI_009_DATA, downloadOfficialDocument } from '../data/officialDocumentContent';
 
 interface OfficialDocumentViewerProps {
-  docCode?: string;
-  docUrl?: string;
   onToast?: (msg: string) => void;
 }
 
-export function OfficialDocumentViewer({ docCode, docUrl, onToast }: OfficialDocumentViewerProps) {
-  const isTpvDoc = 
-    Boolean(docCode && (docCode.includes('POP-ALP-TPV') || docCode.includes('ALP-TPV'))) ||
-    Boolean(docUrl && (docUrl.includes('pop-alp-tpv') || docUrl.includes('doc-pop-alp-tpv')));
-
-  const totalPages = isTpvDoc ? 4 : 5;
-  const pageNumbers = isTpvDoc ? [1, 2, 3, 4] : [1, 2, 3, 4, 5];
-
+export function OfficialDocumentViewer({ onToast }: OfficialDocumentViewerProps) {
   const [currentPage, setCurrentPage] = useState<number | 'all'>('all');
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const data = PTS_SGI_009_DATA;
-  const tpvData = TPV_CARGA_SUELTA_DATA;
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleDownload = () => {
-    if (isTpvDoc) {
-      downloadTpvDocument(tpvData);
-      if (onToast) onToast('Descargando procedimiento oficial Despacho Carga Suelta TPV');
-    } else {
-      downloadOfficialDocument(data);
-      if (onToast) onToast('Descargando documento oficial PTS-SGI-009');
-    }
+    downloadOfficialDocument(data);
+    if (onToast) onToast('Descargando documento oficial PTS-SGI-009');
   };
 
   return (
@@ -66,9 +46,9 @@ export function OfficialDocumentViewer({ docCode, docUrl, onToast }: OfficialDoc
                 : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
             }`}
           >
-            Todas ({totalPages})
+            Todas (5)
           </button>
-          {pageNumbers.map((pageNum) => (
+          {[1, 2, 3, 4, 5].map((pageNum) => (
             <button
               key={pageNum}
               onClick={() => setCurrentPage(pageNum)}
@@ -136,276 +116,8 @@ export function OfficialDocumentViewer({ docCode, docUrl, onToast }: OfficialDoc
           style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
         >
 
-          {/* ================= TPV CARGA SUELTA (4 PÁGINAS) ================= */}
-          {isTpvDoc ? (
-            <>
-              {/* PÁGINA 1: OBJETO, CAMPO, NORMAS, DEFINICIONES, RESPONSABILIDADES */}
-              {(currentPage === 'all' || currentPage === 1) && (
-                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-12 min-h-[920px] flex flex-col justify-between text-slate-900 relative">
-                  <div className="space-y-4">
-                    {/* Header institucional con Logo del Saco */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between border-b-2 border-[#003B6F] pb-3 mb-4 gap-3">
-                      <div className="flex items-center gap-3">
-                        <img 
-                          src="/logo-saco.svg" 
-                          alt="Logo Saco - Carga Suelta" 
-                          className="h-12 w-auto object-contain shrink-0"
-                        />
-                        <div className="text-left">
-                          <div className="font-bold text-xs sm:text-sm text-slate-900 tracking-wide uppercase">
-                            {tpvData.headerCompany}
-                          </div>
-                          <div className="text-[11px] font-semibold text-[#003B6F] tracking-wide uppercase">
-                            {tpvData.headerCategory}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <span className="px-2.5 py-1 text-[11px] font-mono font-bold bg-amber-50 text-amber-900 border border-amber-300 rounded-sm">
-                          {tpvData.code}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mb-4">
-                      <h1 className="text-lg sm:text-xl font-bold text-[#003B6F] underline tracking-tight uppercase">
-                        {tpvData.title}
-                      </h1>
-                      <p className="text-xs sm:text-sm italic text-slate-500 mt-0.5">
-                        {tpvData.subtitle}
-                      </p>
-                    </div>
-
-                    {/* 1. Objeto */}
-                    <div>
-                      <h3 className="text-sm font-bold text-[#003B6F] uppercase mb-1">
-                        1. OBJETO
-                      </h3>
-                      {tpvData.objeto.map((p, idx) => (
-                        <p key={idx} className="text-xs sm:text-[13px] text-slate-800 leading-relaxed mb-2 text-justify">
-                          {p}
-                        </p>
-                      ))}
-                    </div>
-
-                    {/* 2. Campo de Aplicación */}
-                    <div>
-                      <h3 className="text-sm font-bold text-[#003B6F] uppercase mb-1">
-                        2. CAMPO DE APLICACIÓN
-                      </h3>
-                      {tpvData.campoAplicacion.map((p, idx) => (
-                        <p key={idx} className="text-xs sm:text-[13px] text-slate-800 leading-relaxed mb-2 text-justify">
-                          {p}
-                        </p>
-                      ))}
-                    </div>
-
-                    {/* 3. Normas y Referencias */}
-                    <div>
-                      <h3 className="text-sm font-bold text-[#003B6F] uppercase mb-1">
-                        3. NORMAS Y REFERENCIAS
-                      </h3>
-                      <p className="text-xs sm:text-[13px] text-slate-800 leading-relaxed">
-                        {tpvData.normasReferencias}
-                      </p>
-                    </div>
-
-                    {/* 4. Definiciones y/o Abreviaturas */}
-                    <div>
-                      <h3 className="text-sm font-bold text-[#003B6F] uppercase mb-2">
-                        4. DEFINICIONES Y/O ABREVIATURAS
-                      </h3>
-                      <table className="w-full border-collapse border border-slate-700 text-xs sm:text-[13px]">
-                        <tbody>
-                          {tpvData.definiciones.map((d, dIdx) => (
-                            <tr key={dIdx} className={dIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                              <td className="border border-slate-700 p-2 font-bold w-1/4 align-top text-slate-900 bg-slate-100/60">
-                                {d.term}
-                              </td>
-                              <td className="border border-slate-700 p-2 text-slate-800 align-top">
-                                {d.def}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* 5. Método - 5.1 Responsabilidades (Inicio) */}
-                    <div>
-                      <h3 className="text-sm font-bold text-[#003B6F] uppercase mb-1">
-                        5. MÉTODO
-                      </h3>
-                      <h4 className="text-xs sm:text-sm font-bold text-[#0284C7] mb-2">
-                        5.1 RESPONSABILIDADES
-                      </h4>
-                      
-                      <p className="text-xs sm:text-[13px] font-bold text-slate-900 mb-1">
-                        {tpvData.responsabilidades[0].role}:
-                      </p>
-                      <ul className="list-disc list-inside space-y-1 text-xs sm:text-[13px] text-slate-800 ml-2 mb-3">
-                        {tpvData.responsabilidades[0].items.map((it, itIdx) => (
-                          <li key={itIdx}>{it}</li>
-                        ))}
-                      </ul>
-
-                      <p className="text-xs sm:text-[13px] font-bold text-slate-900 mb-1">
-                        {tpvData.responsabilidades[1].role}:
-                      </p>
-                      <ul className="list-disc list-inside space-y-1 text-xs sm:text-[13px] text-slate-800 ml-2">
-                        {tpvData.responsabilidades[1].items.slice(0, 3).map((it, itIdx) => (
-                          <li key={itIdx}>{it}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="pt-4 border-t border-slate-200 mt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-1">
-                    <span className="uppercase tracking-wider font-semibold">{tpvData.watermark}</span>
-                    <span>Página 1 de 4</span>
-                  </div>
-                </div>
-              )}
-
-              {/* PÁGINA 2: CONTINUACIÓN RESPONSABILIDADES & ETAPAS 5.2.1 A 5.2.4 */}
-              {(currentPage === 'all' || currentPage === 2) && (
-                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-12 min-h-[920px] flex flex-col justify-between text-slate-900 relative">
-                  <div className="space-y-4">
-                    {/* Header */}
-                    <div className="text-center font-bold text-xs sm:text-sm text-slate-800 border-b-2 border-[#003B6F] pb-2 mb-4 tracking-wide uppercase">
-                      {tpvData.headerCompany} | {tpvData.headerCategory}
-                    </div>
-
-                    {/* Continuación Responsabilidades */}
-                    <ul className="list-disc list-inside space-y-1 text-xs sm:text-[13px] text-slate-800 ml-2 mb-4">
-                      {tpvData.responsabilidades[1].items.slice(3).map((it, itIdx) => (
-                        <li key={itIdx}>{it}</li>
-                      ))}
-                    </ul>
-
-                    {/* 5.2 Etapas */}
-                    <h4 className="text-xs sm:text-sm font-bold text-[#0284C7] mb-3 uppercase">
-                      5.2 DESCRIPCIÓN DE LAS ETAPAS DEL PROCESO DE DESPACHO DE CARGA SUELTA - TPV
-                    </h4>
-
-                    {tpvData.etapas.slice(0, 4).map((et, eIdx) => (
-                      <div key={eIdx} className="space-y-1.5 pt-1">
-                        <h5 className="text-xs sm:text-sm font-bold text-[#0284C7]">
-                          {et.code} {et.title}
-                        </h5>
-                        {et.paragraphs?.map((p, pIdx) => (
-                          <p key={pIdx} className="text-xs sm:text-[13px] text-slate-800 leading-relaxed text-justify">
-                            {p}
-                          </p>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="pt-4 border-t border-slate-200 mt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-1">
-                    <span className="uppercase tracking-wider font-semibold">{tpvData.watermark}</span>
-                    <span>Página 2 de 4</span>
-                  </div>
-                </div>
-              )}
-
-              {/* PÁGINA 3: ETAPAS 5.2.5 A 5.2.10 (CON ALERTA IMPORTANTE) */}
-              {(currentPage === 'all' || currentPage === 3) && (
-                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-12 min-h-[920px] flex flex-col justify-between text-slate-900 relative">
-                  <div className="space-y-4">
-                    {/* Header */}
-                    <div className="text-center font-bold text-xs sm:text-sm text-slate-800 border-b-2 border-[#003B6F] pb-2 mb-4 tracking-wide uppercase">
-                      {tpvData.headerCompany} | {tpvData.headerCategory}
-                    </div>
-
-                    {tpvData.etapas.slice(4).map((et, eIdx) => (
-                      <div key={eIdx} className="space-y-1.5 pt-1">
-                        <h5 className="text-xs sm:text-sm font-bold text-[#0284C7]">
-                          {et.code} {et.title}
-                        </h5>
-                        {et.paragraphs?.map((p, pIdx) => (
-                          <p key={pIdx} className="text-xs sm:text-[13px] text-slate-800 leading-relaxed text-justify">
-                            {p}
-                          </p>
-                        ))}
-                        {et.important && (
-                          <div className="p-3 my-2 bg-rose-50 border-l-4 border-rose-600 text-rose-700 text-xs sm:text-[13px] font-bold">
-                            {et.important}
-                          </div>
-                        )}
-                        {et.paragraphsAfter?.map((pa, paIdx) => (
-                          <p key={paIdx} className="text-xs sm:text-[13px] text-slate-800 leading-relaxed text-justify">
-                            {pa}
-                          </p>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="pt-4 border-t border-slate-200 mt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-1">
-                    <span className="uppercase tracking-wider font-semibold">{tpvData.watermark}</span>
-                    <span>Página 3 de 4</span>
-                  </div>
-                </div>
-              )}
-
-              {/* PÁGINA 4: PUNTOS CRÍTICOS & REGISTROS */}
-              {(currentPage === 'all' || currentPage === 4) && (
-                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-12 min-h-[920px] flex flex-col justify-between text-slate-900 relative">
-                  <div className="space-y-6">
-                    {/* Header */}
-                    <div className="text-center font-bold text-xs sm:text-sm text-slate-800 border-b-2 border-[#003B6F] pb-2 mb-4 tracking-wide uppercase">
-                      {tpvData.headerCompany} | {tpvData.headerCategory}
-                    </div>
-
-                    {/* 6. Puntos Críticos del Proceso */}
-                    <div>
-                      <h3 className="text-sm font-bold text-[#003B6F] uppercase mb-3">
-                        6. PUNTOS CRÍTICOS DEL PROCESO
-                      </h3>
-                      <ul className="space-y-2.5 text-xs sm:text-[13px] text-slate-800">
-                        {tpvData.puntosCriticos.map((pc, pcIdx) => (
-                          <li key={pcIdx} className="flex items-start gap-2 text-justify">
-                            <span className="text-[#003B6F] font-bold shrink-0">•</span>
-                            <span>
-                              <strong className="text-slate-900">{pc.label}:</strong> {pc.text}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* 7. Registros */}
-                    <div className="pt-4">
-                      <h3 className="text-sm font-bold text-[#003B6F] uppercase mb-3">
-                        7. REGISTROS
-                      </h3>
-                      <ul className="space-y-2 text-xs sm:text-[13px] text-slate-800">
-                        {tpvData.registros.map((reg, rIdx) => (
-                          <li key={rIdx} className="flex items-start gap-2">
-                            <span className="text-[#003B6F] font-bold shrink-0">•</span>
-                            <span>{reg}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="pt-4 border-t border-slate-200 mt-6 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-1">
-                    <span className="uppercase tracking-wider font-semibold">{tpvData.watermark}</span>
-                    <span>Página 4 de 4</span>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* ================= PÁGINA 1: PORTADA ================= */}
-              {(currentPage === 'all' || currentPage === 1) && (
+          {/* ================= PÁGINA 1: PORTADA ================= */}
+          {(currentPage === 'all' || currentPage === 1) && (
                 <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
               {/* Header Logo */}
               <div className="text-center pt-4">
@@ -802,8 +514,6 @@ export function OfficialDocumentViewer({ docCode, docUrl, onToast }: OfficialDoc
               </div>
             </div>
           )}
-        </>
-      )}
 
         </div>
       </div>
