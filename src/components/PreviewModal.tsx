@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ExternalLink, Download, Copy, Check, FileText, Loader2, Printer } from 'lucide-react';
 import { OfficialDocumentViewer } from './OfficialDocumentViewer';
-import { downloadOfficialDocument, PTS_SGI_009_DATA } from '../data/officialDocumentContent';
+import { downloadOfficialDocument, getOfficialDocumentData } from '../data/officialDocumentContent';
 
 interface PreviewModalProps {
   url: string | null;
@@ -18,8 +18,10 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   const [isLoading, setIsLoading] = useState(true);
 
   const isInternalDoc = 
-    Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009'))) ||
-    Boolean(url && (url.includes('pts-sgi-009') || url.startsWith('#doc-')));
+    Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009') || code.includes('POE-OP-001') || code.includes('POE- OP-001'))) ||
+    Boolean(url && (url.includes('pts-sgi-009') || url.includes('poe-op-001') || url.startsWith('#doc-')));
+
+  const officialDocData = isInternalDoc ? getOfficialDocumentData(code || url || '') : null;
 
   useEffect(() => {
     setIsLoading(true);
@@ -48,7 +50,8 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
 
   const handleCopyLink = () => {
     if (isInternalDoc) {
-      navigator.clipboard.writeText(`${window.location.origin}/#pts-sgi-009`);
+      const docSlug = code?.toLowerCase().replace(/[\s-]+/g, '-') || 'doc';
+      navigator.clipboard.writeText(`${window.location.origin}/#${docSlug}`);
       setCopied(true);
       onToast('Enlace de procedimiento copiado al portapapeles');
     } else {
@@ -60,10 +63,10 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   };
 
   const handleDownloadInternal = (e: React.MouseEvent) => {
-    if (isInternalDoc) {
+    if (isInternalDoc && officialDocData) {
       e.preventDefault();
-      downloadOfficialDocument(PTS_SGI_009_DATA);
-      onToast('Descargando documento oficial PTS-SGI-009');
+      downloadOfficialDocument(officialDocData);
+      onToast(`Descargando documento oficial ${officialDocData.code}`);
     }
   };
 
@@ -184,7 +187,7 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
           {/* Document Content */}
           <div className="relative flex-1 bg-slate-100 overflow-hidden flex flex-col">
             {isInternalDoc ? (
-              <OfficialDocumentViewer onToast={onToast} />
+              <OfficialDocumentViewer documentData={officialDocData || undefined} onToast={onToast} />
             ) : (
               <>
                 {isLoading && (

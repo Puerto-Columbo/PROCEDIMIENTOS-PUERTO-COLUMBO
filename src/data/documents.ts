@@ -177,6 +177,22 @@ export const proceduresData: DocumentItem[] = [
     ],
     pdfUrl: "#doc-pts-sgi-009"
   },
+  { 
+    id: "proc-11", 
+    code: "POE- OP-001",
+    title: "Procedimiento Operativo de Gestión, Arriendo y Devoluciones de Contenedores", 
+    category: "Gestión de Contenedores", 
+    date: "22-09-2026 • Versión 000", 
+    type: "procedure",
+    fileType: "pdf",
+    description: "Establecer los lineamientos y directrices estandarizadas para el requerimiento, control sistemático y devolución de contenedores arrendados. Este procedimiento busca centralizar la administración de los equipos, asegurar la trazabilidad en el sistema XPS (evitando el uso de planillas manuales informales), optimizar los costos de arriendo y almacenaje, y prevenir contingencias en auditorías aduaneras.",
+    steps: [
+      "5.2.1 Solicitud de Contenedores y Servicios: El Área Comercial envía solicitud del servicio a Operaciones sin contactar a proveedores. Almacén Bodega corrobora disponibilidad de espacio o contenedores en arriendo, y Comercial informa a Almacén Patio la cantidad a arrendar. Almacén Patio gestiona con proveedor (Spacewise, Contekner, etc.) con al menos una semana de anticipación.",
+      "5.2.2 Ingreso, Trazabilidad Sistemática y Resguardo: Gate Control registra Gate In en XPS. Para extensión de bodega, el Controlador solicita a Sistemas la creación de una ubicación específica (N° contenedor) en la PR de carga suelta. CFS registra la tarja con el detalle de la mutación. Comercial y Almacén Bodega modifican estado del contenedor en Administración OS y Parámetros (Vacío/Full).",
+      "5.2.3 Proceso de Devolución y Cierre de Cobros: El Controlador audita semanalmente contenedores vacíos en XPS y consulta liberación a Comercial (plazo hasta el 25 de cada mes). Almacén Patio coordina devolución con proveedor y porteo carga tramos. Gate Control ejecuta Gate Out y el Controlador coordina con Sistemas la inactivación de la ubicación creada asegurando el cese definitivo de facturación."
+    ],
+    pdfUrl: "#doc-poe-op-001"
+  },
 ];
 
 export const checklistsData: DocumentItem[] = [

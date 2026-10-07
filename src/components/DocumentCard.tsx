@@ -18,7 +18,7 @@ import {
   Layers
 } from 'lucide-react';
 import { DocumentItem } from '../types';
-import { downloadOfficialDocument, PTS_SGI_009_DATA } from '../data/officialDocumentContent';
+import { downloadOfficialDocument, getOfficialDocumentData } from '../data/officialDocumentContent';
 
 interface DocumentCardProps {
   key?: string | number;
@@ -33,6 +33,7 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
 
   const getDepartmentIcon = (category: string, title: string) => {
     const text = (category + ' ' + title).toLowerCase();
+    if (text.includes('contenedor') || text.includes('arriendo')) return Boxes;
     if (text.includes('gate control')) return Truck;
     if (text.includes('cfs')) return Building2;
     if (text.includes('bodega')) return Boxes;
@@ -46,12 +47,17 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
 
   const IconComponent = getDepartmentIcon(item.category, item.title);
 
-  const isInternal = Boolean(item.pdfUrl?.startsWith('#') || item.code?.includes('PTS-SGI-009'));
+  const isInternal = Boolean(
+    item.pdfUrl?.startsWith('#') ||
+    item.code?.includes('PTS-SGI-009') ||
+    item.code?.includes('POE-OP-001') ||
+    item.code?.includes('POE- OP-001')
+  );
 
   const handleCopyLink = () => {
     if (!item.pdfUrl) return;
     if (isInternal) {
-      navigator.clipboard.writeText(`${window.location.origin}/#${item.code?.toLowerCase().replace(/\s+/g, '-')}`);
+      navigator.clipboard.writeText(`${window.location.origin}/#${item.code?.toLowerCase().replace(/[\s-]+/g, '-')}`);
     } else {
       navigator.clipboard.writeText(item.pdfUrl);
     }
@@ -63,7 +69,8 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
   const handleDownload = (e: React.MouseEvent) => {
     if (isInternal) {
       e.preventDefault();
-      downloadOfficialDocument(PTS_SGI_009_DATA);
+      const docData = getOfficialDocumentData(item.code || item.pdfUrl);
+      downloadOfficialDocument(docData);
       onToast(`Descargando documento oficial: ${item.title}`);
     }
   };

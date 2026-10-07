@@ -11,16 +11,27 @@ import {
   ZoomIn,
   ZoomOut
 } from 'lucide-react';
-import { PTS_SGI_009_DATA, downloadOfficialDocument } from '../data/officialDocumentContent';
+import { 
+  PTS_SGI_009_DATA, 
+  POE_OP_001_DATA, 
+  getOfficialDocumentData, 
+  downloadOfficialDocument, 
+  OfficialDocumentData 
+} from '../data/officialDocumentContent';
 
 interface OfficialDocumentViewerProps {
+  documentData?: OfficialDocumentData;
+  code?: string;
+  url?: string;
   onToast?: (msg: string) => void;
 }
 
-export function OfficialDocumentViewer({ onToast }: OfficialDocumentViewerProps) {
+export function OfficialDocumentViewer({ documentData, code, url, onToast }: OfficialDocumentViewerProps) {
   const [currentPage, setCurrentPage] = useState<number | 'all'>('all');
   const [zoomLevel, setZoomLevel] = useState<number>(100);
-  const data = PTS_SGI_009_DATA;
+  const data = documentData || getOfficialDocumentData(code || url);
+  const isPoe = data.code.includes('POE');
+  const totalPages = data.pages || (isPoe ? 6 : 5);
 
   const handlePrint = () => {
     window.print();
@@ -28,7 +39,7 @@ export function OfficialDocumentViewer({ onToast }: OfficialDocumentViewerProps)
 
   const handleDownload = () => {
     downloadOfficialDocument(data);
-    if (onToast) onToast('Descargando documento oficial PTS-SGI-009');
+    if (onToast) onToast(`Descargando documento oficial ${data.code}`);
   };
 
   return (
@@ -46,9 +57,9 @@ export function OfficialDocumentViewer({ onToast }: OfficialDocumentViewerProps)
                 : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
             }`}
           >
-            Todas (5)
+            Todas ({totalPages})
           </button>
-          {[1, 2, 3, 4, 5].map((pageNum) => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
             <button
               key={pageNum}
               onClick={() => setCurrentPage(pageNum)}
@@ -116,403 +127,975 @@ export function OfficialDocumentViewer({ onToast }: OfficialDocumentViewerProps)
           style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
         >
 
-          {/* ================= PÁGINA 1: PORTADA ================= */}
-          {(currentPage === 'all' || currentPage === 1) && (
+          {isPoe ? (
+            /* =========================================================================
+               DOCUMENTO: POE- OP-001 (PROCEDIMIENTO ARRIENDO Y DEVOLUCIONES DE CONTENEDORES)
+               ========================================================================= */
+            <>
+              {/* PÁGINA 1: PORTADA */}
+              {(currentPage === 'all' || currentPage === 1) && (
                 <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
-              {/* Header Logo */}
-              <div className="text-center pt-4">
-                <div className="flex justify-center mb-2">
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src="https://res.cloudinary.com/djmo7ydpm/image/upload/v1776870967/logo-puerto_2xaaaaaaaaa_olrchx.png" 
-                      alt="Puerto Columbo" 
-                      className="h-16 w-auto object-contain"
-                    />
+                  {/* Header Logo */}
+                  <div className="text-center pt-4">
+                    <div className="flex justify-center mb-2">
+                      <img 
+                        src="https://res.cloudinary.com/djmo7ydpm/image/upload/v1776870967/logo-puerto_2xaaaaaaaaa_olrchx.png" 
+                        alt="Puerto Columbo" 
+                        className="h-16 w-auto object-contain"
+                      />
+                    </div>
+                    <h2 className="text-2xl font-bold tracking-tight text-[#003B6F] uppercase">
+                      PUERTO COLUMBO
+                    </h2>
+                    <p className="text-xs font-bold text-slate-500 tracking-wider uppercase mt-0.5">
+                      D&C EXTRAPORTUARIO
+                    </p>
                   </div>
-                </div>
-                <h2 className="text-2xl font-bold tracking-tight text-[#003B6F] uppercase">
-                  PUERTO COLUMBO
-                </h2>
-                <p className="text-xs font-bold text-slate-500 tracking-wider uppercase mt-0.5">
-                  D&C EXTRAPORTUARIO
-                </p>
-              </div>
 
-              {/* Title Box */}
-              <div className="my-10">
-                <div className="bg-slate-200 border border-slate-400 py-4 px-6 text-center shadow-xs">
-                  <h1 className="text-xl sm:text-2xl font-bold text-slate-950 tracking-tight">
-                    {data.title}
-                  </h1>
-                </div>
-              </div>
-
-              {/* Metadata Block */}
-              <div className="space-y-3 max-w-md mx-auto text-sm sm:text-base w-full">
-                <div className="flex items-baseline">
-                  <span className="w-44 font-bold text-slate-900">Código:</span>
-                  <span className="font-mono font-bold text-slate-950 text-lg bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
-                    {data.code}
-                  </span>
-                </div>
-                <div className="flex items-baseline">
-                  <span className="w-44 font-bold text-slate-900">Número Versión:</span>
-                  <span className="font-mono text-slate-800">{data.version}</span>
-                </div>
-                <div className="flex items-baseline">
-                  <span className="w-44 font-bold text-slate-900">Año:</span>
-                  <span className="text-slate-800">{data.year}</span>
-                </div>
-                <div className="flex items-baseline">
-                  <span className="w-44 font-bold text-slate-900">Páginas:</span>
-                  <span className="text-slate-800">{data.pages}</span>
-                </div>
-              </div>
-
-              {/* Signatures Table */}
-              <div className="mt-14 mb-4">
-                <table className="w-full border-collapse border border-slate-900 text-xs sm:text-sm">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
-                        EMITE
-                      </th>
-                      <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
-                        REVISA
-                      </th>
-                      <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
-                        APRUEBA
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
-                        <div><strong className="text-slate-700">Nombre:</strong> {data.emite.name}</div>
-                        <div><strong className="text-slate-700">Fecha:</strong> {data.emite.date}</div>
-                        <div className="pt-2 text-slate-400 italic text-[11px] flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Firma Registrada SGI</span>
-                        </div>
-                      </td>
-                      <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
-                        <div><strong className="text-slate-700">Nombre:</strong> {data.revisa.name}</div>
-                        <div><strong className="text-slate-700">Fecha:</strong> {data.revisa.date}</div>
-                        <div className="pt-2 text-slate-400 italic text-[11px] flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Firma Registrada SGI</span>
-                        </div>
-                      </td>
-                      <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
-                        <div><strong className="text-slate-700">Nombre:</strong> {data.aprueba.name}</div>
-                        <div><strong className="text-slate-700">Fecha:</strong> {data.aprueba.date}</div>
-                        <div className="pt-2 text-slate-400 italic text-[11px] flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Firma Registrada SGI</span>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Page Footer */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Puerto Columbo S.A. • Procedimiento Operador Maquinaria</span>
-                <span>Página 1 de 5</span>
-              </div>
-            </div>
-          )}
-
-          {/* ================= PÁGINA 2: ÍNDICE ================= */}
-          {(currentPage === 'all' || currentPage === 2) && (
-            <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
-              <div>
-                {/* Header Strip */}
-                <div className="flex items-center justify-between pb-4 mb-8 border-b border-slate-200">
-                  <span className="text-xs font-bold text-slate-600 tracking-wider">PUERTO COLUMBO S.A.</span>
-                  <span className="text-xs font-mono font-bold text-slate-500">{data.code}</span>
-                </div>
-
-                {/* Index Title */}
-                <h2 className="text-base sm:text-lg font-bold tracking-widest text-slate-900 uppercase border-b-2 border-slate-900 pb-1 inline-block mb-8">
-                  Í N D I C E
-                </h2>
-
-                {/* Index Entries */}
-                <div className="space-y-4 text-sm sm:text-base font-semibold text-slate-800 max-w-lg pl-2">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">1.</span>
-                    <span>OBJETO</span>
+                  {/* Title Box */}
+                  <div className="my-8">
+                    <div className="bg-slate-200 border border-slate-400 py-4 px-6 text-center shadow-xs">
+                      <h1 className="text-xl sm:text-2xl font-bold text-slate-950 tracking-tight">
+                        {data.title}
+                      </h1>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">2.</span>
-                    <span>CAMPO DE APLICACIÓN</span>
+
+                  {/* Metadata Block */}
+                  <div className="space-y-3 max-w-md mx-auto text-sm sm:text-base w-full">
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Código:</span>
+                      <span className="font-mono font-bold text-slate-950 text-lg bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                        {data.code}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Número Versión:</span>
+                      <span className="font-mono text-slate-800">{data.version}</span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Año:</span>
+                      <span className="text-slate-800">{data.year}</span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Páginas:</span>
+                      <span className="text-slate-800">{data.pages}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">3.</span>
-                    <span>NORMAS Y REFERENCIAS</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">4.</span>
-                    <span>DEFINICIONES Y/O ABREVIATURAS</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">5.</span>
-                    <span>METODO</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">6.</span>
-                    <span>ASPECTOS ADICIONALES</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">7.</span>
-                    <span>ANEXOS</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[#003B6F] font-bold w-6">8.</span>
-                    <span>CONTROL DE CAMBIOS</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Official Stamp */}
-              <div className="my-16 text-center">
-                <div className="inline-block border-4 border-red-600 bg-red-50/40 p-6 px-10 rounded-sm">
-                  <p className="text-red-700 font-extrabold text-base tracking-wider uppercase mb-1">
-                    COPIA CONTROLADA
-                  </p>
-                  <p className="text-red-600 italic text-xs font-semibold">
-                    “Documento impreso es copia No controlada”
-                  </p>
-                </div>
-              </div>
-
-              {/* Page Footer */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Puerto Columbo S.A. • Procedimiento Operador Maquinaria</span>
-                <span>Página 2 de 5</span>
-              </div>
-            </div>
-          )}
-
-          {/* ================= PÁGINA 3: CONTENIDO PRINCIPAL ================= */}
-          {(currentPage === 'all' || currentPage === 3) && (
-            <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
-              <div className="space-y-6">
-                {/* Header Strip */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
-                  <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
-                  <span className="font-mono font-bold text-slate-500">{data.code}</span>
-                </div>
-
-                {/* 1. Objeto */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
-                    1. OBJETO
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed text-justify">
-                    {data.objeto}
-                  </p>
-                </div>
-
-                {/* 2. Campo de Aplicación */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
-                    2. CAMPO DE APLICACIÓN
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed text-justify">
-                    {data.campoAplicacion}
-                  </p>
-                </div>
-
-                {/* 3. Normas y Referencias */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
-                    3. NORMAS Y REFERENCIAS
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
-                    {data.normasReferencias}
-                  </p>
-                </div>
-
-                {/* 4. Definiciones */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
-                    4. DEFINICIONES Y/O ABREVIATURAS
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
-                    {data.definiciones}
-                  </p>
-                </div>
-
-                {/* 5. Método */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
-                    5. MÉTODO
-                  </h3>
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 mb-3 ml-2 uppercase">
-                    5.1 RESPONSABILIDADES
-                  </h4>
-                  
-                  <div className="space-y-4 ml-4">
-                    {data.responsabilidades.map((resp, idx) => (
-                      <div key={idx} className="space-y-1.5">
-                        <p className="text-xs sm:text-sm font-bold text-slate-900">
-                          {resp.role}:
-                        </p>
-                        <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
-                          {resp.items.map((item, iIdx) => (
-                            <li key={iIdx} className="leading-relaxed">
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Page Footer */}
-              <div className="pt-4 mt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Puerto Columbo S.A. • Procedimiento Operador Maquinaria</span>
-                <span>Página 3 de 5</span>
-              </div>
-            </div>
-          )}
-
-          {/* ================= PÁGINA 4: ETAPAS DEL PROCESO ================= */}
-          {(currentPage === 'all' || currentPage === 4) && (
-            <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
-              <div className="space-y-6">
-                {/* Header Strip */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
-                  <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
-                  <span className="font-mono font-bold text-slate-500">{data.code}</span>
-                </div>
-
-                {/* 5.2 Etapas */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-3 uppercase">
-                    5.2 DESCRIPCIÓN DE LAS ETAPAS DEL PROCESO
-                  </h3>
-
-                  <div className="space-y-5 ml-2">
-                    {data.etapas.map((etapa, eIdx) => (
-                      <div key={eIdx} className="space-y-2">
-                        <h4 className="text-xs sm:text-sm font-bold text-[#003B6F]">
-                          {etapa.code} {etapa.title}
-                        </h4>
-                        <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1.5 pl-3">
-                          {etapa.items.map((it, itIdx) => (
-                            <li key={itIdx} className="leading-relaxed text-justify">
-                              {it}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 6. Aspectos Adicionales */}
-                <div className="pt-4">
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-3 uppercase">
-                    6. ASPECTOS ADICIONALES
-                  </h3>
-                  <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-2.5 ml-2 pl-3">
-                    {data.aspectosAdicionales.map((asp, aIdx) => (
-                      <li key={aIdx} className="leading-relaxed text-justify">
-                        {asp}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Page Footer */}
-              <div className="pt-4 mt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Puerto Columbo S.A. • Procedimiento Operador Maquinaria</span>
-                <span>Página 4 de 5</span>
-              </div>
-            </div>
-          )}
-
-          {/* ================= PÁGINA 5: ANEXOS & CONTROL DE CAMBIOS ================= */}
-          {(currentPage === 'all' || currentPage === 5) && (
-            <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
-              <div className="space-y-8">
-                {/* Header Strip */}
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
-                  <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
-                  <span className="font-mono font-bold text-slate-500">{data.code}</span>
-                </div>
-
-                {/* 7. Anexos */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
-                    7. ANEXOS
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
-                    {data.anexos}
-                  </p>
-                </div>
-
-                {/* 8. Control de Cambios */}
-                <div>
-                  <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-3 uppercase">
-                    8. CONTROL DE CAMBIOS
-                  </h3>
-
-                  <div className="overflow-x-auto">
+                  {/* Signatures Table - 5 Signers */}
+                  <div className="mt-8 mb-4">
                     <table className="w-full border-collapse border border-slate-900 text-xs sm:text-sm">
                       <thead>
                         <tr className="bg-slate-100">
-                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/4">
-                            Versión
+                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
+                            EMITE
                           </th>
-                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/2">
-                            Descripción
+                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
+                            REVISA Y APRUEBA
                           </th>
-                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/4">
-                            Fecha
+                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
+                            REVISA Y APRUEBA
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {data.controlCambios.map((cambio, cIdx) => (
-                          <tr key={cIdx} className="bg-white">
-                            <td className="border border-slate-900 p-2.5 font-mono font-bold">
-                              {cambio.version}
-                            </td>
-                            <td className="border border-slate-900 p-2.5">
-                              {cambio.description}
-                            </td>
-                            <td className="border border-slate-900 p-2.5 text-slate-700">
-                              {cambio.date}
-                            </td>
-                          </tr>
-                        ))}
+                        <tr>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> M. Silva</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> 22-09-2026</div>
+                            <div className="pt-1.5 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> J. Acuña</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> 22-09-2026</div>
+                            <div className="pt-1.5 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> L. Muñoz</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> 22-09-2026</div>
+                            <div className="pt-1.5 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="bg-slate-100">
+                          <th className="border border-slate-900 p-2.5 text-left font-bold">
+                            REVISA Y APRUEBA
+                          </th>
+                          <th className="border border-slate-900 p-2.5 text-left font-bold">
+                            REVISA Y APRUEBA
+                          </th>
+                          <th className="border border-slate-900 p-2.5 bg-slate-50"></th>
+                        </tr>
+                        <tr>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> F. Riffo</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> 22-09-2026</div>
+                            <div className="pt-1.5 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> R. Mancilla</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> 22-09-2026</div>
+                            <div className="pt-1.5 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                          <td className="border border-slate-900 p-3 align-middle text-center bg-slate-50 text-[11px] text-slate-400 italic">
+                            Oficial SGI Puerto Columbo
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 1 de 6</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Institutional Sign-off */}
-              <div className="pt-10 pb-4 text-center">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-                  Sistema de Gestión Integrado (SGI) • Puerto Columbo Valparaíso
-                </p>
-              </div>
+              {/* PÁGINA 2: ÍNDICE */}
+              {(currentPage === 'all' || currentPage === 2) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div>
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-4 mb-8 border-b border-slate-200">
+                      <span className="text-xs font-bold text-slate-600 tracking-wider">PUERTO COLUMBO S.A.</span>
+                      <span className="text-xs font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
 
-              {/* Page Footer */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
-                <span>Puerto Columbo S.A. • Procedimiento Operador Maquinaria</span>
-                <span>Página 5 de 5</span>
-              </div>
-            </div>
+                    {/* Index Title */}
+                    <h2 className="text-base sm:text-lg font-bold tracking-widest text-slate-900 uppercase border-b-2 border-slate-900 pb-1 inline-block mb-8">
+                      I N D I C E
+                    </h2>
+
+                    {/* Index Entries */}
+                    <div className="space-y-4 text-sm sm:text-base font-semibold text-slate-800 max-w-lg pl-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">1.</span>
+                        <span>OBJETO</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">2.</span>
+                        <span>CAMPO DE APLICACIÓN</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">3.</span>
+                        <span>NORMAS Y REFERENCIAS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">4.</span>
+                        <span>DEFINICIONES Y/O ABREVIATURAS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">5.</span>
+                        <span>ENTIDADES AFECTADAS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">6.</span>
+                        <span>METODO</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">7.</span>
+                        <span>REGISTROS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">8.</span>
+                        <span>ANEXOS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">9.</span>
+                        <span>CONTROL DE CAMBIOS</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Official Stamp */}
+                  <div className="my-16 text-center">
+                    <div className="inline-block border-4 border-red-600 bg-red-50/40 p-6 px-10 rounded-sm">
+                      <p className="text-red-700 font-extrabold text-base tracking-wider uppercase mb-1">
+                        COPIA CONTROLADA
+                      </p>
+                      <p className="text-red-600 italic text-xs font-semibold">
+                        “Documento impreso es copia No controlada”
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 2 de 6</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PÁGINA 3: OBJETO, CAMPO, NORMAS, DEFINICIONES, 5. MÉTODO & RESPONSABILIDADES (PARTE 1) */}
+              {(currentPage === 'all' || currentPage === 3) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div className="space-y-6">
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                      <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
+                      <span className="font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* 1. Objeto */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        1. OBJETO
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed text-justify">
+                        {data.objeto}
+                      </p>
+                    </div>
+
+                    {/* 2. Campo de Aplicación */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        2. CAMPO DE APLICACIÓN
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed text-justify">
+                        {data.campoAplicacion}
+                      </p>
+                    </div>
+
+                    {/* 3. Normas y Referencias */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        3. NORMAS Y REFERENCIAS
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                        {data.normasReferencias}
+                      </p>
+                    </div>
+
+                    {/* 4. Definiciones y/o Abreviaturas */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        4. DEFINICIONES Y/O ABREVIATURAS
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                        {data.definiciones}
+                      </p>
+                    </div>
+
+                    {/* 5. Método */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        5. MÉTODO
+                      </h3>
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 mb-3 ml-2 uppercase">
+                        5.1 RESPONSABILIDADES
+                      </h4>
+                      
+                      <div className="space-y-4 ml-4">
+                        <div className="space-y-1.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-900">
+                            Control de Gestión (Controlador):
+                          </p>
+                          <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
+                            <li className="leading-relaxed">Gestionar con el Área de Sistemas la activación o desactivación de ubicaciones.</li>
+                            <li className="leading-relaxed">Auditar constantemente el sistema XPS para detectar contenedores en estado “Vacío”.</li>
+                            <li className="leading-relaxed">Mantener comunicación constante con las áreas involucradas respecto al estado de los contenedores.</li>
+                          </ul>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-900">
+                            Área Comercial (Customer Service):
+                          </p>
+                          <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
+                            <li className="leading-relaxed">Solicitar servicios (consolidado/trasvasije/desconsolidado) directamente a Operaciones, sin gestionar contenedores directamente con los proveedores.</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 mt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 3 de 6</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PÁGINA 4: RESPONSABILIDADES (CONTINUACIÓN) & ETAPAS (5.2.1) */}
+              {(currentPage === 'all' || currentPage === 4) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div className="space-y-6">
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                      <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
+                      <span className="font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* Responsabilidades continuación */}
+                    <div className="space-y-4">
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 uppercase">
+                        5.1 RESPONSABILIDADES (Continuación)
+                      </h4>
+
+                      <div className="space-y-4 ml-4">
+                        <div className="space-y-1.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-900">
+                            Área Comercial (Customer Service) - continuación:
+                          </p>
+                          <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
+                            <li className="leading-relaxed">Responder dentro del plazo estipulado dentro del procedimiento a las notificaciones del área de control sobre contenedores vacíos.</li>
+                            <li className="leading-relaxed">Abstenerse de retener contenedores “por si acaso” si no existe un negocio cerrado inminente.</li>
+                          </ul>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-900">
+                            Almacén Bodega:
+                          </p>
+                          <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
+                            <li className="leading-relaxed">Modificar en sistema, en el campo de observaciones, si el contenedor se encuentra Full o Vacío.</li>
+                            <li className="leading-relaxed">Informar oportunamente al área de control sobre la liberación de equipos físicos.</li>
+                          </ul>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-900">
+                            CFS:
+                          </p>
+                          <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
+                            <li className="leading-relaxed">Ejecutar los movimientos físicos de los contenedores y faenas y registrar las tarjas en el sistema XPS al momento exacto de la operación.</li>
+                          </ul>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <p className="text-xs sm:text-sm font-bold text-slate-900">
+                            Almacén Patio:
+                          </p>
+                          <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
+                            <li className="leading-relaxed">Gestionar arriendo y devolución de las unidades.</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 5.2 Etapas */}
+                    <div className="pt-2">
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-3 uppercase">
+                        5.2 DESCRIPCIÓN DE LAS ETAPAS DEL PROCESO
+                      </h3>
+
+                      <div className="space-y-3 ml-2">
+                        <h4 className="text-xs sm:text-sm font-bold text-[#003B6F]">
+                          5.2.1 Solicitud de Contenedores y Servicios
+                        </h4>
+                        <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-2 pl-3">
+                          <li className="leading-relaxed text-justify">
+                            El Área Comercial cierra un negocio que requiere extensión de bodega o trasvasije. Comercial envía la solicitud del servicio a Operaciones, indicando el volumen y requerimientos, sin contactar a proveedores de contenedores.
+                          </li>
+                          <li className="leading-relaxed text-justify">
+                            Almacén Bodega debe corroborar primero, si tiene espacio en bodega para almacenar la carga, en caso de no ser así, se debe revisar si hay contenedores en arriendo disponible, y en caso de no ser así, Bodega informa a Comercial que no hay espacio, por lo que, se debe proceder a arrendar contenedores.
+                          </li>
+                          <li className="leading-relaxed text-justify">
+                            Área Comercial debe informar a Área de Almacén Patio la cantidad de contenedores que se deben arrendar.
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 mt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 4 de 6</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PÁGINA 5: 5.2.1 (CONTINUACIÓN CON PROVEEDOR E IMPORTANTE) & 5.2.2 */}
+              {(currentPage === 'all' || currentPage === 5) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div className="space-y-6">
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                      <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
+                      <span className="font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* 5.2.1 Continuación */}
+                    <div className="space-y-3">
+                      <h4 className="text-xs sm:text-sm font-bold text-[#003B6F]">
+                        5.2.1 Solicitud de Contenedores y Servicios (Continuación)
+                      </h4>
+                      <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-2 pl-3">
+                        <li className="leading-relaxed text-justify">
+                          Almacén Patio debe gestionar con proveedor (Spacewise, Contekner, etc.) el arriendo y retiro del contenedor.
+                        </li>
+                      </ul>
+
+                      <div className="p-3.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-amber-900 text-xs sm:text-sm font-medium">
+                        <strong>Importante:</strong> Se debe solicitar el arriendo de la unidad, a lo menos, con una semana de anticipación.
+                      </div>
+                    </div>
+
+                    {/* 5.2.2 Ingreso, Trazabilidad Sistemática y Resguardo */}
+                    <div className="pt-4 space-y-3">
+                      <h4 className="text-xs sm:text-sm font-bold text-[#003B6F]">
+                        5.2.2 Ingreso, Trazabilidad Sistemática y Resguardo
+                      </h4>
+                      <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-3 pl-3">
+                        <li className="leading-relaxed text-justify">
+                          Al ingresar el contenedor arrendado, Gate Control debe registrar el Gate In en el sistema XPS.
+                        </li>
+                        <li className="leading-relaxed text-justify">
+                          Para contenedores destinados a extensión de bodega, el Controlador solicitará a Sistemas la creación de una ubicación específica (N° de contenedor). El contenedor se asignará a esta ubicación para separar claramente la “carga suelta” almacenada y evitar confusiones en auditorías aduaneras con cargas de exportación/tránsito. Esta información debe registrarse en la PR de carga suelta (Modificar Ubicación).
+                        </li>
+                        <li className="leading-relaxed text-justify">
+                          Al realizar un trasvasije o desconsolidado, el tarjador de Operaciones (CFS) debe generar la tarja en el sistema, agregando en el campo de “Observaciones” el detalle de la mutación de la carga.
+                        </li>
+                        <li className="leading-relaxed text-justify">
+                          Es de carácter imperativo que el área Comercial junto al área de Almacén Bodega modifique el estado de contenedor arrendado en sistema. El área Comercial debe modificar lo siguiente: En caso que el contenedor esté vacío, se debe registrar como cliente “Puerto Columbo”. Para los contenedores Full, en cliente se debe registrar, ya sea, extensión de bodega en caso de la carga retenida, y en caso que el contenedor tenga carga de cliente, se debe registrar el nombre del cliente, y esto debe realizarse en Administración OS.<br/><br/>
+                          El área de Almacén Bodega, debe modificar en el campo de observaciones de Parámetros de contenedores, si el contenedor se encuentra “Vacío” o “Full”.
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 mt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 5 de 6</span>
+                  </div>
+                </div>
+              )}
+
+              {/* PÁGINA 6: 5.2.3, 6. REGISTROS, 7. ANEXOS, 8. CONTROL DE CAMBIOS */}
+              {(currentPage === 'all' || currentPage === 6) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div className="space-y-6">
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                      <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
+                      <span className="font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* 5.2.3 Proceso de Devolución y Cierre de Cobros */}
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-[#003B6F] mb-2">
+                        5.2.3 Proceso de Devolución y Cierre de Cobros
+                      </h4>
+                      <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-2.5 pl-3">
+                        <li className="leading-relaxed text-justify">
+                          Al menos una vez por semana, el Controlador extraerá la data del sistema XPS identificando todos los contenedores arrendados en estado “Vacío”.
+                        </li>
+                        <li className="leading-relaxed text-justify">
+                          El Controlador enviará un listado formal al área Comercial consultando la liberación definitiva de estos equipos.
+                        </li>
+                        <li className="leading-relaxed text-justify">
+                          El área Comercial tiene un plazo hasta el 25 de cada mes para reclamar el uso de un contenedor vacío justificando un negocio inminente, o bien, informar la no utilización del contenedor. En caso de no haber respuesta, se procederá con la devolución automática de la unidad.
+                        </li>
+                        <li className="leading-relaxed text-justify">
+                          El área de Almacén Patio informará al proveedor (Spacewise, Contekner, etc.) sobre la devolución de la unidad, solicitando el lugar de entrega y gestionando la misma. La modificación de la OS y la carga de los tramos lo realizará el área de porteo una vez que el proveedor haya confirmado el lugar de entrega del contenedor vacío.
+                        </li>
+                        <li className="leading-relaxed text-justify">
+                          Gate Control ejecuta la salida física (Gate Out). Inmediatamente, el Controlador coordina con Sistemas la eliminación/inactivación de la ubicación sistemática creada, asegurando el cese definitivo de la facturación por arriendo y almacenaje.
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* 6. Registros */}
+                    <div className="pt-2">
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-1.5 uppercase">
+                        6. REGISTROS
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                        {data.registros || 'El presente procedimiento no considera registros.'}
+                      </p>
+                    </div>
+
+                    {/* 7. Anexos */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-1.5 uppercase">
+                        7. ANEXOS
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                        {data.anexos}
+                      </p>
+                    </div>
+
+                    {/* 8. Control de Cambios */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        8. CONTROL DE CAMBIOS
+                      </h3>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border border-slate-900 text-xs sm:text-sm">
+                          <thead>
+                            <tr className="bg-slate-100">
+                              <th className="border border-slate-900 p-2 text-left font-bold w-1/4">
+                                Versión
+                              </th>
+                              <th className="border border-slate-900 p-2 text-left font-bold w-1/2">
+                                Descripción
+                              </th>
+                              <th className="border border-slate-900 p-2 text-left font-bold w-1/4">
+                                Fecha
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {data.controlCambios.map((cambio, cIdx) => (
+                              <tr key={cIdx} className="bg-white">
+                                <td className="border border-slate-900 p-2 font-mono font-bold">
+                                  {cambio.version}
+                                </td>
+                                <td className="border border-slate-900 p-2">
+                                  {cambio.description}
+                                </td>
+                                <td className="border border-slate-900 p-2 text-slate-700">
+                                  {cambio.date}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Institutional Sign-off */}
+                  <div className="pt-6 pb-2 text-center">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+                      Sistema de Gestión Integrado (SGI) • Puerto Columbo Valparaíso
+                    </p>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 6 de 6</span>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            /* =========================================================================
+               DOCUMENTO: PTS-SGI-009 (PROCEDIMIENTO OPERADOR MAQUINARIA)
+               ========================================================================= */
+            <>
+              {/* ================= PÁGINA 1: PORTADA ================= */}
+              {(currentPage === 'all' || currentPage === 1) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  {/* Header Logo */}
+                  <div className="text-center pt-4">
+                    <div className="flex justify-center mb-2">
+                      <img 
+                        src="https://res.cloudinary.com/djmo7ydpm/image/upload/v1776870967/logo-puerto_2xaaaaaaaaa_olrchx.png" 
+                        alt="Puerto Columbo" 
+                        className="h-16 w-auto object-contain"
+                      />
+                    </div>
+                    <h2 className="text-2xl font-bold tracking-tight text-[#003B6F] uppercase">
+                      PUERTO COLUMBO
+                    </h2>
+                    <p className="text-xs font-bold text-slate-500 tracking-wider uppercase mt-0.5">
+                      D&C EXTRAPORTUARIO
+                    </p>
+                  </div>
+
+                  {/* Title Box */}
+                  <div className="my-10">
+                    <div className="bg-slate-200 border border-slate-400 py-4 px-6 text-center shadow-xs">
+                      <h1 className="text-xl sm:text-2xl font-bold text-slate-950 tracking-tight">
+                        {data.title}
+                      </h1>
+                    </div>
+                  </div>
+
+                  {/* Metadata Block */}
+                  <div className="space-y-3 max-w-md mx-auto text-sm sm:text-base w-full">
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Código:</span>
+                      <span className="font-mono font-bold text-slate-950 text-lg bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                        {data.code}
+                      </span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Número Versión:</span>
+                      <span className="font-mono text-slate-800">{data.version}</span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Año:</span>
+                      <span className="text-slate-800">{data.year}</span>
+                    </div>
+                    <div className="flex items-baseline">
+                      <span className="w-44 font-bold text-slate-900">Páginas:</span>
+                      <span className="text-slate-800">{data.pages}</span>
+                    </div>
+                  </div>
+
+                  {/* Signatures Table */}
+                  <div className="mt-14 mb-4">
+                    <table className="w-full border-collapse border border-slate-900 text-xs sm:text-sm">
+                      <thead>
+                        <tr className="bg-slate-100">
+                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
+                            EMITE
+                          </th>
+                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
+                            REVISA
+                          </th>
+                          <th className="border border-slate-900 p-2.5 text-left font-bold w-1/3">
+                            APRUEBA
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> {data.emite?.name || 'M. Silva'}</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> {data.emite?.date || '23-09-2026'}</div>
+                            <div className="pt-2 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> {data.revisa?.name || 'L. Muñoz'}</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> {data.revisa?.date || '23-09-2026'}</div>
+                            <div className="pt-2 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                          <td className="border border-slate-900 p-3 space-y-1 align-top bg-white">
+                            <div><strong className="text-slate-700">Nombre:</strong> {data.aprueba?.name || 'L. Muñoz'}</div>
+                            <div><strong className="text-slate-700">Fecha:</strong> {data.aprueba?.date || '23-09-2026'}</div>
+                            <div className="pt-2 text-slate-400 italic text-[11px] flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Firma Registrada SGI</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 1 de 5</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ================= PÁGINA 2: ÍNDICE ================= */}
+              {(currentPage === 'all' || currentPage === 2) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div>
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-4 mb-8 border-b border-slate-200">
+                      <span className="text-xs font-bold text-slate-600 tracking-wider">PUERTO COLUMBO S.A.</span>
+                      <span className="text-xs font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* Index Title */}
+                    <h2 className="text-base sm:text-lg font-bold tracking-widest text-slate-900 uppercase border-b-2 border-slate-900 pb-1 inline-block mb-8">
+                      Í N D I C E
+                    </h2>
+
+                    {/* Index Entries */}
+                    <div className="space-y-4 text-sm sm:text-base font-semibold text-slate-800 max-w-lg pl-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">1.</span>
+                        <span>OBJETO</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">2.</span>
+                        <span>CAMPO DE APLICACIÓN</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">3.</span>
+                        <span>NORMAS Y REFERENCIAS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">4.</span>
+                        <span>DEFINICIONES Y/O ABREVIATURAS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">5.</span>
+                        <span>METODO</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">6.</span>
+                        <span>ASPECTOS ADICIONALES</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">7.</span>
+                        <span>ANEXOS</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[#003B6F] font-bold w-6">8.</span>
+                        <span>CONTROL DE CAMBIOS</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Official Stamp */}
+                  <div className="my-16 text-center">
+                    <div className="inline-block border-4 border-red-600 bg-red-50/40 p-6 px-10 rounded-sm">
+                      <p className="text-red-700 font-extrabold text-base tracking-wider uppercase mb-1">
+                        COPIA CONTROLADA
+                      </p>
+                      <p className="text-red-600 italic text-xs font-semibold">
+                        “Documento impreso es copia No controlada”
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 2 de 5</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ================= PÁGINA 3: CONTENIDO PRINCIPAL ================= */}
+              {(currentPage === 'all' || currentPage === 3) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div className="space-y-6">
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                      <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
+                      <span className="font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* 1. Objeto */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        1. OBJETO
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed text-justify">
+                        {data.objeto}
+                      </p>
+                    </div>
+
+                    {/* 2. Campo de Aplicación */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        2. CAMPO DE APLICACIÓN
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed text-justify">
+                        {data.campoAplicacion}
+                      </p>
+                    </div>
+
+                    {/* 3. Normas y Referencias */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        3. NORMAS Y REFERENCIAS
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                        {data.normasReferencias}
+                      </p>
+                    </div>
+
+                    {/* 4. Definiciones */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        4. DEFINICIONES Y/O ABREVIATURAS
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                        {data.definiciones}
+                      </p>
+                    </div>
+
+                    {/* 5. Método */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        5. MÉTODO
+                      </h3>
+                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 mb-3 ml-2 uppercase">
+                        5.1 RESPONSABILIDADES
+                      </h4>
+                      
+                      <div className="space-y-4 ml-4">
+                        {data.responsabilidades.map((resp, idx) => (
+                          <div key={idx} className="space-y-1.5">
+                            <p className="text-xs sm:text-sm font-bold text-slate-900">
+                              {resp.role}:
+                            </p>
+                            <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1 pl-2">
+                              {resp.items.map((item, iIdx) => (
+                                <li key={iIdx} className="leading-relaxed">
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 mt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 3 de 5</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ================= PÁGINA 4: ETAPAS DEL PROCESO ================= */}
+              {(currentPage === 'all' || currentPage === 4) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div className="space-y-6">
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                      <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
+                      <span className="font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* 5.2 Etapas */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-3 uppercase">
+                        5.2 DESCRIPCIÓN DE LAS ETAPAS DEL PROCESO
+                      </h3>
+
+                      <div className="space-y-5 ml-2">
+                        {data.etapas.map((etapa, eIdx) => (
+                          <div key={eIdx} className="space-y-2">
+                            <h4 className="text-xs sm:text-sm font-bold text-[#003B6F]">
+                              {etapa.code} {etapa.title}
+                            </h4>
+                            <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-1.5 pl-3">
+                              {etapa.items.map((it, itIdx) => (
+                                <li key={itIdx} className="leading-relaxed text-justify">
+                                  {it}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 6. Aspectos Adicionales */}
+                    {data.aspectosAdicionales && (
+                      <div className="pt-4">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-3 uppercase">
+                          6. ASPECTOS ADICIONALES
+                        </h3>
+                        <ul className="list-disc list-inside text-xs sm:text-sm text-slate-800 space-y-2.5 ml-2 pl-3">
+                          {data.aspectosAdicionales.map((asp, aIdx) => (
+                            <li key={aIdx} className="leading-relaxed text-justify">
+                              {asp}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 mt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 4 de 5</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ================= PÁGINA 5: ANEXOS & CONTROL DE CAMBIOS ================= */}
+              {(currentPage === 'all' || currentPage === 5) && (
+                <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-8 sm:p-14 min-h-[900px] flex flex-col justify-between text-slate-900 relative">
+                  <div className="space-y-8">
+                    {/* Header Strip */}
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-200 text-xs">
+                      <span className="font-bold text-slate-600">PUERTO COLUMBO S.A.</span>
+                      <span className="font-mono font-bold text-slate-500">{data.code}</span>
+                    </div>
+
+                    {/* 7. Anexos */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-2 uppercase">
+                        7. ANEXOS
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-800 leading-relaxed">
+                        {data.anexos}
+                      </p>
+                    </div>
+
+                    {/* 8. Control de Cambios */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-bold text-slate-950 mb-3 uppercase">
+                        8. CONTROL DE CAMBIOS
+                      </h3>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border border-slate-900 text-xs sm:text-sm">
+                          <thead>
+                            <tr className="bg-slate-100">
+                              <th className="border border-slate-900 p-2.5 text-left font-bold w-1/4">
+                                Versión
+                              </th>
+                              <th className="border border-slate-900 p-2.5 text-left font-bold w-1/2">
+                                Descripción
+                              </th>
+                              <th className="border border-slate-900 p-2.5 text-left font-bold w-1/4">
+                                Fecha
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {data.controlCambios.map((cambio, cIdx) => (
+                              <tr key={cIdx} className="bg-white">
+                                <td className="border border-slate-900 p-2.5 font-mono font-bold">
+                                  {cambio.version}
+                                </td>
+                                <td className="border border-slate-900 p-2.5">
+                                  {cambio.description}
+                                </td>
+                                <td className="border border-slate-900 p-2.5 text-slate-700">
+                                  {cambio.date}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Institutional Sign-off */}
+                  <div className="pt-10 pb-4 text-center">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
+                      Sistema de Gestión Integrado (SGI) • Puerto Columbo Valparaíso
+                    </p>
+                  </div>
+
+                  {/* Page Footer */}
+                  <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
+                    <span>Puerto Columbo S.A. • {data.title}</span>
+                    <span>Página 5 de 5</span>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
         </div>
