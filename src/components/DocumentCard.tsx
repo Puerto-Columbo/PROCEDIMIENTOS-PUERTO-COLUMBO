@@ -50,8 +50,7 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
   const isInternal = Boolean(
     item.pdfUrl?.startsWith('#') ||
     item.code?.includes('PTS-SGI-009') ||
-    item.code?.includes('POE-OP-001') ||
-    item.code?.includes('POE- OP-001')
+    item.code?.includes('PTS- SGI-009')
   );
 
   const handleCopyLink = () => {
