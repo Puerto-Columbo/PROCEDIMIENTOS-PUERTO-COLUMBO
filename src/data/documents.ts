@@ -176,6 +176,23 @@ export const proceduresData: DocumentItem[] = [
       "6. Aspectos Adicionales: Estar atento y concentrado a indicaciones de carga, descarga, recepción y despacho, realizando todas las labores de manera segura para la carga y el entorno de trabajo."
     ],
     pdfUrl: "#doc-pts-sgi-009"
+  },
+  { 
+    id: "proc-11", 
+    code: "POE- OP-001",
+    title: "Procedimiento Operativo de Gestión, Arriendo y Devoluciones de Contenedores", 
+    category: "Arriendo Contenedores", 
+    date: "22-09-2026 • Versión 000", 
+    type: "procedure",
+    fileType: "pdf",
+    description: "Establecer los lineamientos y directrices estandarizadas para el requerimiento, control sistemático y devolución de contenedores arrendados. Este procedimiento busca centralizar la administración de los equipos, asegurar la trazabilidad en el sistema XPS (evitando el uso de planillas manuales informales), optimizar los costos de arriendo y almacenaje, y prevenir contingencias en auditorías aduaneras.",
+    steps: [
+      "5.2.1 Solicitud de Contenedores y Servicios: El Área Comercial envía solicitud a Operaciones sin contactar a proveedores. Almacén Bodega corrobora espacio o arriendo disponible. Comercial informa a Almacén Patio la cantidad a arrendar, y Patio gestiona con proveedor (Spacewise, Contekner, etc.) con al menos una semana de anticipación.",
+      "5.2.2 Ingreso, Trazabilidad Sistemática y Resguardo: Gate Control registra Gate In en XPS. Para extensión de bodega se crea ubicación específica en XPS y se registra en PR de carga suelta. Tarjador CFS genera tarja detallando mutación en Observaciones. Comercial registra cliente en Administración OS y Bodega actualiza campo 'Vacío' o 'Full' en Parámetros.",
+      "5.2.3 Proceso de Devolución y Cierre de Cobros: Semanalmente el Controlador identifica unidades en estado 'Vacío' en XPS y consulta formalmente a Comercial (plazo hasta el 25 de cada mes; sin respuesta se devuelve automáticamente). Patio coordina entrega con proveedor, porteo actualiza tramos, Gate Control ejecuta Gate Out y Sistemas inactiva la ubicación para cesar cobros.",
+      "Responsabilidades del Proceso: Control de Gestión (auditoría en XPS y gestión de ubicaciones), Comercial (solicitudes directas a Operaciones y plazos de liberación), Almacén Bodega (registro Full/Vacío y liberación física), CFS (movimientos y tarjas en XPS) y Almacén Patio (arriendo y devolución con proveedores)."
+    ],
+    pdfUrl: "#doc-poe-op-001"
   }
 ];
 

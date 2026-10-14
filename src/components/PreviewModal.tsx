@@ -18,8 +18,8 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   const [isLoading, setIsLoading] = useState(true);
 
   const isInternalDoc = 
-    Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009'))) ||
-    Boolean(url && (url.includes('pts-sgi-009') || url.startsWith('#doc-')));
+    Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009') || code.includes('POE'))) ||
+    Boolean(url && (url.includes('pts-sgi-009') || url.includes('poe-op-001') || url.startsWith('#doc-')));
 
   const officialDocData = isInternalDoc ? getOfficialDocumentData(code || url || '') : null;
 

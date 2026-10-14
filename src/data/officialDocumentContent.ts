@@ -1,7 +1,8 @@
 export interface DocumentSignature {
   role: string;
   name: string;
-  date: string;
+  date?: string;
+  signatureText?: string;
 }
 
 export interface OfficialDocumentData {
@@ -118,11 +119,517 @@ export const PTS_SGI_009_DATA: OfficialDocumentData = {
   ],
 };
 
-export function getOfficialDocumentData(_codeOrUrl?: string): OfficialDocumentData {
+export const POE_OP_001_DATA: OfficialDocumentData = {
+  title: "Procedimiento Operativo de Gestión, Arriendo y Devoluciones de Contenedores",
+  code: "POE- OP-001",
+  version: "000",
+  year: "2026",
+  pages: 6,
+  signatures: [
+    { role: "EMITE", name: "M. Silva", date: "" },
+    { role: "REVISA Y APRUEBA", name: "J. Acuña", date: "" },
+    { role: "REVISA Y APRUEBA", name: "L. Muñoz", date: "" },
+    { role: "REVISA Y APRUEBA", name: "F. Riffo", date: "" },
+    { role: "REVISA Y APRUEBA", name: "R. Mancilla", date: "" },
+  ],
+  indice: [
+    "1. OBJETO",
+    "2. CAMPO DE APLICACIÓN",
+    "3. NORMAS Y REFERENCIAS",
+    "4. DEFINICIONES Y/O ABREVIATURAS",
+    "5. ENTIDADES AFECTADAS",
+    "6. METODO",
+    "7. REGISTROS",
+    "8. ANEXOS",
+    "9. CONTROL DE CAMBIOS",
+  ],
+  objeto:
+    "Establecer los lineamientos y directrices estandarizadas para el requerimiento, control sistemático y devolución de contenedores arrendados. Este procedimiento busca centralizar la administración de los equipos, asegurar la trazabilidad en el sistema XPS (evitando el uso de planillas manuales informales), optimizar los costos de arriendo y almacenaje, y prevenir contingencias en auditorías aduaneras",
+  campoAplicacion:
+    "Aplica al área de Customer Service, Almacén Bodega, Almacén Patio, Control de Gestión de Puerto Columbo S.A., incluyendo personal de empresas contratistas, subcontratistas, proveedores de productos y servicios.",
+  normasReferencias: "El presente procedimiento no considera normas y/o referencias",
+  definiciones: "El presente procedimiento no considera definiciones y/o abreviaturas",
+  responsabilidades: [
+    {
+      role: "Control de Gestión (Controlador)",
+      items: [
+        "Gestionar con el Área de Sistemas la activación o desactivación de ubicaciones.",
+        "Auditar constantemente el sistema XPS para detectar contenedores en estado “Vacío”.",
+        "Mantener comunicación constante con las áreas involucradas respecto al estado de los contenedores.",
+      ],
+    },
+    {
+      role: "Área Comercial (Customer Service)",
+      items: [
+        "Solicitar servicios (consolidado/trasvasije/desconsolidado) directamente a Operaciones, sin gestionar contenedores directamente con los proveedores.",
+        "Responder dentro del plazo estipulado dentro del procedimiento a las notificaciones del área de control sobre contenedores vacíos.",
+        "Abstenerse de retener contenedores “por si acaso” si no existe un negocio cerrado inminente.",
+      ],
+    },
+    {
+      role: "Almacén Bodega",
+      items: [
+        "Modificar en sistema, en el campo de observaciones, si el contenedor se encuentra Full o Vacío.",
+        "Informar oportunamente al área de control sobre la liberación de equipos físicos.",
+      ],
+    },
+    {
+      role: "CFS",
+      items: [
+        "Ejecutar los movimientos físicos de los contenedores y faenas y registrar las tarjas en el sistema XPS al momento exacto de la operación.",
+      ],
+    },
+    {
+      role: "Almacén Patio",
+      items: [
+        "Gestionar arriendo y devolución de las unidades.",
+      ],
+    },
+  ],
+  etapas: [
+    {
+      code: "5.2.1",
+      title: "Solicitud de Contenedores y Servicios",
+      items: [
+        "El Área Comercial cierra un negocio que requiere extensión de bodega o trasvasije. Comercial envía la solicitud del servicio a Operaciones, indicando el volumen y requerimientos, sin contactar a proveedores de contenedores.",
+        "Almacén Bodega debe corroborar primero, si tiene espacio en bodega para almacenar la carga, en caso de no ser así, se debe revisar si hay contenedores en arriendo disponible, y en caso de no ser así, Bodega informa a Comercial que no hay espacio, por lo que, se debe proceder a arrendar contenedores.",
+        "Área Comercial debe informar a Área de Almacén Patio la cantidad de contenedores que se deben arrendar.",
+        "Almacén Patio debe gestionar con proveedor (Spacewise, Contekner, etc.) el arriendo y retiro del contenedor",
+        "Importante: Se debe solicitar el arriendo de la unidad, a lo menos, con una semana de anticipación.",
+      ],
+    },
+    {
+      code: "5.2.2",
+      title: "Ingreso, Trazabilidad Sistemática y Resguardo",
+      items: [
+        "Al ingresar el contenedor arrendado, Gate Control debe registrar el Gate In en el sistema XPS.",
+        "Para contenedores destinados a extensión de bodega, el Controlador solicitará a Sistemas la creación de una ubicación específica (N° de contenedor). El contenedor se asignará a esta ubicación para separar claramente la “carga suelta” almacenada y evitar confusiones en auditorías aduaneras con cargas de exportación/tránsito. Esta información debe registrarse en la PR de carga suelta (Modificar Ubicación)",
+        "Al realizar un trasvasije o desconsolidado, el tarjador de Operaciones (CFS) debe generar la tarja en el sistema, agregando en el campo de “Observaciones” el detalle de la mutación de la carga.",
+        "Es de carácter imperativo que el área Comercial junto al área de Almacén Bodega modifique el estado de contenedor arrendado en sistema. El área Comercial debe modificar lo siguiente: En caso que el contenedor esté vacío, se debe registrar como cliente “Puerto Columbo”. Para los contenedores Full, en cliente se debe registrar, ya sea, extensión de bodega en caso de la carga retenida, y en caso que el contenedor tenga carga de cliente, se debe registrar el nombre del cliente, y esto debe realizarse en Administración OS.",
+        "El área de Almacén Bodega, debe modificar en el campo de observaciones de Parámetros de contenedores, si el contenedor se encuentra “Vacío” o “Full”.",
+      ],
+    },
+    {
+      code: "5.2.3",
+      title: "Proceso de Devolución y Cierre de Cobros",
+      items: [
+        "Al menos una vez por semana, el Controlador extraerá la data del sistema XPS identificando todos los contenedores arrendados en estado “Vacío”",
+        "El Controlador enviará un listado formal al área Comercial consultando la liberación definitiva de estos equipos.",
+        "El área Comercial tiene un plazo hasta el 25 de cada mes para reclamar el uso de un contenedor vacío justificando un negocio inminente, o bien, informar la no utilización del contenedor. En caso de no haber respuesta, se procederá con la devolución automática de la unidad.",
+        "El área de Almacén Patio informará al proveedor (Spacewise, Contekner, etc.) sobre la devolución de la unidad, solicitando el lugar de entrega y gestionando la misma. La modificación de la OS y la carga de los tramos lo realizará el área de porteo una vez que el proveedor haya confirmado el lugar de entrega del contenedor vacío.",
+        "Gate Control ejecuta la salida física (Gate Out). Inmediatamente, el Controlador coordina con Sistemas la eliminación/inactivación de la ubicación sistemática creada, asegurando el cese definitivo de la facturación por arriendo y almacenaje.",
+      ],
+    },
+  ],
+  registros: "El presente procedimiento no considera registros.",
+  anexos: "El presente procedimiento no considera anexos.",
+  controlCambios: [
+    {
+      version: "000",
+      description: "Creación del documento",
+      date: "22-09-2026",
+    },
+  ],
+};
+
+export function getOfficialDocumentData(codeOrUrl?: string): OfficialDocumentData {
+  const norm = (codeOrUrl || '').toLowerCase();
+  if (
+    norm.includes('poe') || 
+    norm.includes('arriendo') || 
+    norm.includes('devolucion') || 
+    norm.includes('op-001')
+  ) {
+    return POE_OP_001_DATA;
+  }
   return PTS_SGI_009_DATA;
 }
 
 export function downloadOfficialDocument(data: OfficialDocumentData = PTS_SGI_009_DATA) {
+  const isPoe = data.code.includes('POE') || data.pages === 6;
+
+  const signaturesHtml = isPoe
+    ? `
+      <table class="signatures-table">
+        <tr>
+          <th style="width: 33.3%;">EMITE</th>
+          <th style="width: 33.3%;">REVISA Y APRUEBA</th>
+          <th style="width: 33.3%;">REVISA Y APRUEBA</th>
+        </tr>
+        <tr>
+          <td>
+            <p><strong>Nombre:</strong> M. Silva</p>
+            <p><strong>Fecha:</strong></p>
+            <p><strong>Firma:</strong></p>
+          </td>
+          <td>
+            <p><strong>Nombre:</strong> J. Acuña</p>
+            <p><strong>Fecha:</strong></p>
+            <p><strong>Firma:</strong></p>
+          </td>
+          <td>
+            <p><strong>Nombre:</strong> L. Muñoz</p>
+            <p><strong>Fecha:</strong></p>
+            <p><strong>Firma:</strong></p>
+          </td>
+        </tr>
+        <tr>
+          <th style="width: 33.3%;">REVISA Y APRUEBA</th>
+          <th style="width: 33.3%;">REVISA Y APRUEBA</th>
+          <th style="width: 33.3%; background: #fafafa;"></th>
+        </tr>
+        <tr>
+          <td>
+            <p><strong>Nombre:</strong> F. Riffo</p>
+            <p><strong>Fecha:</strong></p>
+            <p><strong>Firma:</strong></p>
+          </td>
+          <td>
+            <p><strong>Nombre:</strong> R. Mancilla</p>
+            <p><strong>Fecha:</strong></p>
+            <p><strong>Firma:</strong></p>
+          </td>
+          <td style="background: #fafafa;"></td>
+        </tr>
+      </table>
+    `
+    : `
+      <table class="signatures-table">
+        <tr>
+          <th style="width: 33%;">EMITE</th>
+          <th style="width: 33%;">REVISA</th>
+          <th style="width: 33%;">APRUEBA</th>
+        </tr>
+        <tr>
+          <td>
+            <p><strong>Nombre:</strong> ${data.emite?.name || 'M. Silva'}</p>
+            <p><strong>Fecha:</strong> ${data.emite?.date || '23-09-2026'}</p>
+            <p><strong>Firma:</strong> <em>Registrada SGI</em></p>
+          </td>
+          <td>
+            <p><strong>Nombre:</strong> ${data.revisa?.name || 'L. Muñoz'}</p>
+            <p><strong>Fecha:</strong> ${data.revisa?.date || '23-09-2026'}</p>
+            <p><strong>Firma:</strong> <em>Registrada SGI</em></p>
+          </td>
+          <td>
+            <p><strong>Nombre:</strong> ${data.aprueba?.name || 'L. Muñoz'}</p>
+            <p><strong>Fecha:</strong> ${data.aprueba?.date || '23-09-2026'}</p>
+            <p><strong>Firma:</strong> <em>Registrada SGI</em></p>
+          </td>
+        </tr>
+      </table>
+    `;
+
+  let pagesContent = '';
+
+  if (isPoe) {
+    // 6-page official document structure matching the original PDF exactly
+    pagesContent = `
+      <!-- PÁGINA 1: PORTADA -->
+      <div class="page">
+        <div class="header-logo">
+          <h2>PUERTO COLUMBO</h2>
+          <p>D&C EXTRAPORTUARIO</p>
+        </div>
+        
+        <div class="title-box">
+          ${data.title}
+        </div>
+
+        <table class="meta-table">
+          <tr>
+            <td style="width: 170px; font-weight: bold;">Código:</td>
+            <td><strong>${data.code}</strong></td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Número Versión:</td>
+            <td>${data.version}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Año:</td>
+            <td>${data.year}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Páginas:</td>
+            <td>${data.pages}</td>
+          </tr>
+        </table>
+
+        ${signaturesHtml}
+      </div>
+
+      <!-- PÁGINA 2: ÍNDICE -->
+      <div class="page">
+        <div class="index-title">I N D I C E</div>
+        <ul class="index-list">
+          <li><strong>1.</strong> OBJETO</li>
+          <li><strong>2.</strong> CAMPO DE APLICACIÓN</li>
+          <li><strong>3.</strong> NORMAS Y REFERENCIAS</li>
+          <li><strong>4.</strong> DEFINICIONES Y/O ABREVIATURAS</li>
+          <li><strong>5.</strong> ENTIDADES AFECTADAS</li>
+          <li><strong>6.</strong> METODO</li>
+          <li><strong>7.</strong> REGISTROS</li>
+          <li><strong>8.</strong> ANEXOS</li>
+          <li><strong>9.</strong> CONTROL DE CAMBIOS</li>
+        </ul>
+
+        <div class="stamp-box">
+          <div style="font-size: 15px; margin-bottom: 4px;">COPIA CONTROLADA</div>
+          <div style="font-size: 12px; font-style: italic;">“Documento impreso es copia No controlada”</div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 3: OBJETO, CAMPO, NORMAS, DEFINICIONES, RESPONSABILIDADES P1 -->
+      <div class="page">
+        <div class="section-title">1. OBJETO</div>
+        <p>${data.objeto}</p>
+
+        <div class="section-title">2. CAMPO DE APLICACIÓN</div>
+        <p>${data.campoAplicacion}</p>
+
+        <div class="section-title">3. NORMAS Y REFERENCIAS</div>
+        <p>${data.normasReferencias}</p>
+
+        <div class="section-title">4. DEFINICIONES Y/O ABREVIATURAS</div>
+        <p>${data.definiciones}</p>
+
+        <div class="section-title">5. MÉTODO</div>
+        <div class="subsection-title">5.1 RESPONSABILIDADES</div>
+        
+        <p style="font-weight: bold; margin-bottom: 4px;">Control de Gestión (Controlador):</p>
+        <ul>
+          <li>Gestionar con el Área de Sistemas la activación o desactivación de ubicaciones.</li>
+          <li>Auditar constantemente el sistema XPS para detectar contenedores en estado “Vacío”.</li>
+          <li>Mantener comunicación constante con las áreas involucradas respecto al estado de los contenedores.</li>
+        </ul>
+
+        <p style="font-weight: bold; margin-bottom: 4px;">Área Comercial (Customer Service):</p>
+        <ul>
+          <li>Solicitar servicios (consolidado/trasvasije/desconsolidado) directamente a Operaciones, sin gestionar contenedores directamente con los proveedores.</li>
+        </ul>
+      </div>
+
+      <!-- PÁGINA 4: RESPONSABILIDADES P2 & ETAPA 5.2.1 -->
+      <div class="page">
+        <ul>
+          <li>Responder dentro del plazo estipulado dentro del procedimiento a las notificaciones del área de control sobre contenedores vacíos.</li>
+          <li>Abstenerse de retener contenedores “por si acaso” si no existe un negocio cerrado inminente.</li>
+        </ul>
+
+        <p style="font-weight: bold; margin-bottom: 4px;">Almacén Bodega:</p>
+        <ul>
+          <li>Modificar en sistema, en el campo de observaciones, si el contenedor se encuentra Full o Vacío.</li>
+          <li>Informar oportunamente al área de control sobre la liberación de equipos físicos.</li>
+        </ul>
+
+        <p style="font-weight: bold; margin-bottom: 4px;">CFS:</p>
+        <ul>
+          <li>Ejecutar los movimientos físicos de los contenedores y faenas y registrar las tarjas en el sistema XPS al momento exacto de la operación.</li>
+        </ul>
+
+        <p style="font-weight: bold; margin-bottom: 4px;">Almacén Patio:</p>
+        <ul>
+          <li>Gestionar arriendo y devolución de las unidades.</li>
+        </ul>
+
+        <div class="section-title">5.2 DESCRIPCIÓN DE LAS ETAPAS DEL PROCESO</div>
+        <div class="subsection-title">5.2.1 Solicitud de Contenedores y Servicios</div>
+        <ul>
+          <li>El Área Comercial cierra un negocio que requiere extensión de bodega o trasvasije. Comercial envía la solicitud del servicio a Operaciones, indicando el volumen y requerimientos, sin contactar a proveedores de contenedores.</li>
+          <li>Almacén Bodega debe corroborar primero, si tiene espacio en bodega para almacenar la carga, en caso de no ser así, se debe revisar si hay contenedores en arriendo disponible, y en caso de no ser así, Bodega informa a Comercial que no hay espacio, por lo que, se debe proceder a arrendar contenedores.</li>
+          <li>Área Comercial debe informar a Área de Almacén Patio la cantidad de contenedores que se deben arrendar.</li>
+        </ul>
+      </div>
+
+      <!-- PÁGINA 5: ETAPA 5.2.1 CONT & ETAPA 5.2.2 -->
+      <div class="page">
+        <ul>
+          <li>Almacén Patio debe gestionar con proveedor (Spacewise, Contekner, etc.) el arriendo y retiro del contenedor</li>
+        </ul>
+
+        <p style="margin-top: 14px; margin-bottom: 20px;"><strong>Importante:</strong> Se debe solicitar el arriendo de la unidad, a lo menos, con <strong>una semana de anticipación</strong>.</p>
+
+        <div class="subsection-title">5.2.2 Ingreso, Trazabilidad Sistemática y Resguardo</div>
+        <ul>
+          <li>Al ingresar el contenedor arrendado, Gate Control debe registrar el Gate In en el sistema XPS.</li>
+          <li>Para contenedores destinados a extensión de bodega, el Controlador solicitará a Sistemas la creación de una ubicación específica (N° de contenedor). El contenedor se asignará a esta ubicación para separar claramente la “carga suelta” almacenada y evitar confusiones en auditorías aduaneras con cargas de exportación/tránsito. Esta información debe registrarse en la PR de carga suelta (Modificar Ubicación)</li>
+          <li>Al realizar un trasvasije o desconsolidado, el tarjador de Operaciones (CFS) debe generar la tarja en el sistema, agregando en el campo de “Observaciones” el detalle de la mutación de la carga.</li>
+          <li>Es de carácter imperativo que el área Comercial junto al área de Almacén Bodega modifique el estado de contenedor arrendado en sistema. El área Comercial debe modificar lo siguiente: En caso que el contenedor esté vacío, se debe registrar como cliente “Puerto Columbo”. Para los contenedores Full, en cliente se debe registrar, ya sea, extensión de bodega en caso de la carga retenida, y en caso que el contenedor tenga carga de cliente, se debe registrar el nombre del cliente, y esto debe realizarse en Administración OS.</li>
+        </ul>
+        <p style="margin-left: 20px; font-size: 13.5px;">El área de Almacén Bodega, debe modificar en el campo de observaciones de Parámetros de contenedores, si el contenedor se encuentra “Vacío” o “Full”.</p>
+      </div>
+
+      <!-- PÁGINA 6: ETAPA 5.2.3, REGISTROS, ANEXOS, CONTROL DE CAMBIOS -->
+      <div class="page">
+        <div class="subsection-title">5.2.3 Proceso de Devolución y Cierre de Cobros</div>
+        <ul>
+          <li>Al menos una vez por semana, el Controlador extraerá la data del sistema XPS identificando todos los contenedores arrendados en estado “Vacío”</li>
+          <li>El Controlador enviará un listado formal al área Comercial consultando la liberación definitiva de estos equipos.</li>
+          <li>El área Comercial tiene un plazo hasta el 25 de cada mes para reclamar el uso de un contenedor vacío justificando un negocio inminente, o bien, informar la no utilización del contenedor. En caso de no haber respuesta, se procederá con la devolución automática de la unidad.</li>
+          <li>El área de Almacén Patio informará al proveedor (Spacewise, Contekner, etc.) sobre la devolución de la unidad, solicitando el lugar de entrega y gestionando la misma. La modificación de la OS y la carga de los tramos lo realizará el área de porteo una vez que el proveedor haya confirmado el lugar de entrega del contenedor vacío.</li>
+          <li>Gate Control ejecuta la salida física (Gate Out). Inmediatamente, el Controlador coordina con Sistemas la eliminación/inactivación de la ubicación sistemática creada, asegurando el cese definitivo de la facturación por arriendo y almacenaje.</li>
+        </ul>
+
+        <div class="section-title">6. REGISTROS</div>
+        <p>${data.registros || 'El presente procedimiento no considera registros.'}</p>
+
+        <div class="section-title">7. ANEXOS</div>
+        <p>${data.anexos}</p>
+
+        <div class="section-title">8. CONTROL DE CAMBIOS</div>
+        <table class="change-table">
+          <tr>
+            <th style="width: 25%;">Versión</th>
+            <th style="width: 50%;">Descripción</th>
+            <th style="width: 25%;">Fecha</th>
+          </tr>
+          ${data.controlCambios
+            .map(
+              (c) => `
+            <tr>
+              <td><strong>${c.version}</strong></td>
+              <td>${c.description}</td>
+              <td>${c.date}</td>
+            </tr>
+          `
+            )
+            .join('')}
+        </table>
+      </div>
+    `;
+  } else {
+    // 5-page structure for PTS-SGI-009
+    pagesContent = `
+      <!-- PÁGINA 1: PORTADA -->
+      <div class="page">
+        <div class="header-logo">
+          <h2>PUERTO COLUMBO</h2>
+          <p>D&C EXTRAPORTUARIO</p>
+        </div>
+        
+        <div class="title-box">
+          ${data.title}
+        </div>
+
+        <table class="meta-table">
+          <tr>
+            <td style="width: 150px; font-weight: bold;">Código:</td>
+            <td><strong>${data.code}</strong></td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Número Versión:</td>
+            <td>${data.version}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Año:</td>
+            <td>${data.year}</td>
+          </tr>
+          <tr>
+            <td style="font-weight: bold;">Páginas:</td>
+            <td>${data.pages}</td>
+          </tr>
+        </table>
+
+        ${signaturesHtml}
+      </div>
+
+      <!-- PÁGINA 2: ÍNDICE -->
+      <div class="page">
+        <div class="index-title">I N D I C E</div>
+        <ul class="index-list">
+          <li><strong>1.</strong> OBJETO</li>
+          <li><strong>2.</strong> CAMPO DE APLICACIÓN</li>
+          <li><strong>3.</strong> NORMAS Y REFERENCIAS</li>
+          <li><strong>4.</strong> DEFINICIONES Y/O ABREVIATURAS</li>
+          <li><strong>5.</strong> METODO</li>
+          <li><strong>6.</strong> ASPECTOS ADICIONALES</li>
+          <li><strong>7.</strong> ANEXOS</li>
+          <li><strong>8.</strong> CONTROL DE CAMBIOS</li>
+        </ul>
+
+        <div class="stamp-box">
+          <div style="font-size: 15px; margin-bottom: 4px;">COPIA CONTROLADA</div>
+          <div style="font-size: 12px; font-style: italic;">“Documento impreso es copia No controlada”</div>
+        </div>
+      </div>
+
+      <!-- PÁGINA 3: OBJETO, CAMPO, NORMAS, DEFINICIONES, RESPONSABILIDADES -->
+      <div class="page">
+        <div class="section-title">1. OBJETO</div>
+        <p>${data.objeto}</p>
+
+        <div class="section-title">2. CAMPO DE APLICACIÓN</div>
+        <p>${data.campoAplicacion}</p>
+
+        <div class="section-title">3. NORMAS Y REFERENCIAS</div>
+        <p>${data.normasReferencias}</p>
+
+        <div class="section-title">4. DEFINICIONES Y/O ABREVIATURAS</div>
+        <p>${data.definiciones}</p>
+
+        <div class="section-title">5. MÉTODO</div>
+        <div class="subsection-title">5.1 RESPONSABILIDADES</div>
+        ${data.responsabilidades
+          .map(
+            (r) => `
+          <p style="font-weight: bold; margin-bottom: 4px;">${r.role}:</p>
+          <ul>
+            ${r.items.map((i) => `<li>${i}</li>`).join('')}
+          </ul>
+        `
+          )
+          .join('')}
+      </div>
+
+      <!-- PÁGINA 4: ETAPAS DEL PROCESO & ASPECTOS ADICIONALES -->
+      <div class="page">
+        <div class="subsection-title">5.2 DESCRIPCIÓN DE LAS ETAPAS DEL PROCESO</div>
+        ${data.etapas
+          .map(
+            (e) => `
+          <div class="subsection-title" style="margin-left: 10px;">${e.code} ${e.title}</div>
+          <ul style="margin-left: 28px;">
+            ${e.items.map((i) => `<li>${i}</li>`).join('')}
+          </ul>
+        `
+          )
+          .join('')}
+
+        ${data.aspectosAdicionales ? `
+        <div class="section-title">6. ASPECTOS ADICIONALES</div>
+        <ul>
+          ${data.aspectosAdicionales.map((a) => `<li>${a}</li>`).join('')}
+        </ul>` : ''}
+      </div>
+
+      <!-- PÁGINA 5: ANEXOS & CONTROL DE CAMBIOS -->
+      <div class="page">
+        <div class="section-title">7. ANEXOS</div>
+        <p>${data.anexos}</p>
+
+        <div class="section-title">8. CONTROL DE CAMBIOS</div>
+        <table class="change-table">
+          <tr>
+            <th style="width: 25%;">Versión</th>
+            <th style="width: 50%;">Descripción</th>
+            <th style="width: 25%;">Fecha</th>
+          </tr>
+          ${data.controlCambios
+            .map(
+              (c) => `
+            <tr>
+              <td><strong>${c.version}</strong></td>
+              <td>${c.description}</td>
+              <td>${c.date}</td>
+            </tr>
+          `
+            )
+            .join('')}
+        </table>
+      </div>
+    `;
+  }
+
   const htmlContent = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -168,16 +675,17 @@ export function downloadOfficialDocument(data: OfficialDocumentData = PTS_SGI_00
     .signatures-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 60px;
+      margin-top: 40px;
       border: 1px solid #000;
     }
     .signatures-table th, .signatures-table td {
       border: 1px solid #000;
-      padding: 12px;
+      padding: 10px;
       text-align: left;
-      font-size: 14px;
+      font-size: 13px;
     }
     .signatures-table th { background: #f3f4f6; }
+    .signatures-table p { margin: 4px 0; }
     .index-title {
       font-weight: bold;
       font-size: 16px;
@@ -233,156 +741,7 @@ export function downloadOfficialDocument(data: OfficialDocumentData = PTS_SGI_00
   </style>
 </head>
 <body>
-  <!-- PÁGINA 1: PORTADA -->
-  <div class="page">
-    <div class="header-logo">
-      <h2>PUERTO COLUMBO</h2>
-      <p>D&C EXTRAPORTUARIO</p>
-    </div>
-    
-    <div class="title-box">
-      ${data.title}
-    </div>
-
-    <table class="meta-table">
-      <tr>
-        <td style="width: 150px; font-weight: bold;">Código:</td>
-        <td><strong>${data.code}</strong></td>
-      </tr>
-      <tr>
-        <td style="font-weight: bold;">Número Versión:</td>
-        <td>${data.version}</td>
-      </tr>
-      <tr>
-        <td style="font-weight: bold;">Año:</td>
-        <td>${data.year}</td>
-      </tr>
-      <tr>
-        <td style="font-weight: bold;">Páginas:</td>
-        <td>${data.pages}</td>
-      </tr>
-    </table>
-
-    <table class="signatures-table">
-      <tr>
-        <th style="width: 33%;">EMITE</th>
-        <th style="width: 33%;">REVISA</th>
-        <th style="width: 33%;">APRUEBA</th>
-      </tr>
-      <tr>
-        <td>
-          <p><strong>Nombre:</strong> ${data.emite?.name || 'M. Silva'}</p>
-          <p><strong>Fecha:</strong> ${data.emite?.date || '23-09-2026'}</p>
-          <p><strong>Firma:</strong> <em>Registrada SGI</em></p>
-        </td>
-        <td>
-          <p><strong>Nombre:</strong> ${data.revisa?.name || 'L. Muñoz'}</p>
-          <p><strong>Fecha:</strong> ${data.revisa?.date || '23-09-2026'}</p>
-          <p><strong>Firma:</strong> <em>Registrada SGI</em></p>
-        </td>
-        <td>
-          <p><strong>Nombre:</strong> ${data.aprueba?.name || 'L. Muñoz'}</p>
-          <p><strong>Fecha:</strong> ${data.aprueba?.date || '23-09-2026'}</p>
-          <p><strong>Firma:</strong> <em>Registrada SGI</em></p>
-        </td>
-      </tr>
-    </table>
-  </div>
-
-  <!-- PÁGINA 2: ÍNDICE -->
-  <div class="page">
-    <div class="index-title">I N D I C E</div>
-    <ul class="index-list">
-      <li><strong>1.</strong> OBJETO</li>
-      <li><strong>2.</strong> CAMPO DE APLICACIÓN</li>
-      <li><strong>3.</strong> NORMAS Y REFERENCIAS</li>
-      <li><strong>4.</strong> DEFINICIONES Y/O ABREVIATURAS</li>
-      <li><strong>5.</strong> METODO</li>
-      <li><strong>6.</strong> ASPECTOS ADICIONALES</li>
-      <li><strong>7.</strong> ANEXOS</li>
-      <li><strong>8.</strong> CONTROL DE CAMBIOS</li>
-    </ul>
-
-    <div class="stamp-box">
-      <div style="font-size: 15px; margin-bottom: 4px;">COPIA CONTROLADA</div>
-      <div style="font-size: 12px; font-style: italic;">“Documento impreso es copia No controlada”</div>
-    </div>
-  </div>
-
-  <!-- PÁGINA 3: OBJETO, CAMPO, NORMAS, DEFINICIONES, RESPONSABILIDADES -->
-  <div class="page">
-    <div class="section-title">1. OBJETO</div>
-    <p>${data.objeto}</p>
-
-    <div class="section-title">2. CAMPO DE APLICACIÓN</div>
-    <p>${data.campoAplicacion}</p>
-
-    <div class="section-title">3. NORMAS Y REFERENCIAS</div>
-    <p>${data.normasReferencias}</p>
-
-    <div class="section-title">4. DEFINICIONES Y/O ABREVIATURAS</div>
-    <p>${data.definiciones}</p>
-
-    <div class="section-title">5. MÉTODO</div>
-    <div class="subsection-title">5.1 RESPONSABILIDADES</div>
-    ${data.responsabilidades
-      .map(
-        (r) => `
-      <p style="font-weight: bold; margin-bottom: 4px;">${r.role}:</p>
-      <ul>
-        ${r.items.map((i) => `<li>${i}</li>`).join('')}
-      </ul>
-    `
-      )
-      .join('')}
-  </div>
-
-  <!-- PÁGINA 4: ETAPAS DEL PROCESO & ASPECTOS ADICIONALES -->
-  <div class="page">
-    <div class="subsection-title">5.2 DESCRIPCIÓN DE LAS ETAPAS DEL PROCESO</div>
-    ${data.etapas
-      .map(
-        (e) => `
-      <div class="subsection-title" style="margin-left: 10px;">${e.code} ${e.title}</div>
-      <ul style="margin-left: 28px;">
-        ${e.items.map((i) => `<li>${i}</li>`).join('')}
-      </ul>
-    `
-      )
-      .join('')}
-
-    ${data.aspectosAdicionales ? `
-    <div class="section-title">6. ASPECTOS ADICIONALES</div>
-    <ul>
-      ${data.aspectosAdicionales.map((a) => `<li>${a}</li>`).join('')}
-    </ul>` : ''}
-  </div>
-
-  <!-- PÁGINA 5: ANEXOS & CONTROL DE CAMBIOS -->
-  <div class="page">
-    <div class="section-title">7. ANEXOS</div>
-    <p>${data.anexos}</p>
-
-    <div class="section-title">8. CONTROL DE CAMBIOS</div>
-    <table class="change-table">
-      <tr>
-        <th style="width: 25%;">Versión</th>
-        <th style="width: 50%;">Descripción</th>
-        <th style="width: 25%;">Fecha</th>
-      </tr>
-      ${data.controlCambios
-        .map(
-          (c) => `
-        <tr>
-          <td><strong>${c.version}</strong></td>
-          <td>${c.description}</td>
-          <td>${c.date}</td>
-        </tr>
-      `
-        )
-        .join('')}
-    </table>
-  </div>
+  ${pagesContent}
 </body>
 </html>`;
 
@@ -396,4 +755,3 @@ export function downloadOfficialDocument(data: OfficialDocumentData = PTS_SGI_00
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
