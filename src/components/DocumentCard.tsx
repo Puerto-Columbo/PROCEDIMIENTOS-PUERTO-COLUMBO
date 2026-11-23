@@ -15,7 +15,8 @@ import {
   Wrench, 
   Headphones, 
   Calendar,
-  Layers
+  Layers,
+  Table2
 } from 'lucide-react';
 import { DocumentItem } from '../types';
 import { downloadOfficialDocument, getOfficialDocumentData } from '../data/officialDocumentContent';
@@ -33,6 +34,7 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
 
   const getDepartmentIcon = (category: string, title: string) => {
     const text = (category + ' ' + title).toLowerCase();
+    if (text.includes('sipoc') || text.includes('matriz')) return Table2;
     if (text.includes('contenedor') || text.includes('arriendo')) return Boxes;
     if (text.includes('gate control')) return Truck;
     if (text.includes('cfs')) return Building2;
@@ -51,7 +53,8 @@ export function DocumentCard({ item, index, onPreview, onToast }: DocumentCardPr
     item.pdfUrl?.startsWith('#') ||
     item.code?.includes('PTS-SGI-009') ||
     item.code?.includes('PTS- SGI-009') ||
-    item.code?.includes('POE')
+    item.code?.includes('POE') ||
+    item.code?.includes('SIPOC')
   );
 
   const handleCopyLink = () => {

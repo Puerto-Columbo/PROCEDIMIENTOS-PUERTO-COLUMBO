@@ -193,6 +193,24 @@ export const proceduresData: DocumentItem[] = [
       "Responsabilidades del Proceso: Control de Gestión (auditoría en XPS y gestión de ubicaciones), Comercial (solicitudes directas a Operaciones y plazos de liberación), Almacén Bodega (registro Full/Vacío y liberación física), CFS (movimientos y tarjas en XPS) y Almacén Patio (arriendo y devolución con proveedores)."
     ],
     pdfUrl: "#doc-poe-op-001"
+  },
+  {
+    id: "proc-12",
+    code: "SIPOC-TVAP",
+    title: "Matriz SIPOC E2E Puerto Columbo TVAP",
+    category: "Matriz SIPOC",
+    date: "Vigente",
+    type: "procedure",
+    fileType: "pdf",
+    description: "Mapeo de Proveedores, Insumos, Procesos, Entregables y Clientes Internos por Módulo Operativo.",
+    steps: [
+      "1. Planificación y Arribo: Comercial & Pricing, Customer Service (CS), Control Documentos.",
+      "2. Ingreso y Porteo: Acceso, Gate Control.",
+      "3. Almacenaje y Patio: Almacén Patio / Jefe de Patio, Patio (Reach Stacker), Área Reefer.",
+      "4. Faenas CFS & Bodega: CFS (Desconsolidado), CFS (Consolidado), CFS( Retiro Vacios), Almacén Bodega.",
+      "5. Despacho y Salida: Gate Out, CS / Control Docs."
+    ],
+    pdfUrl: "#doc-sipoc-e2e-tvap"
   }
 ];
 

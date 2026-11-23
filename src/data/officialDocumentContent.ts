@@ -5,12 +5,30 @@ export interface DocumentSignature {
   signatureText?: string;
 }
 
+export interface SipocRow {
+  id: number;
+  fase: string;
+  modulo: string;
+  proveedor: string;
+  input: string;
+  proceso: string;
+  output: string;
+  cliente: string;
+  sistema: string;
+  sla: string;
+  riesgo: string;
+}
+
 export interface OfficialDocumentData {
   title: string;
+  subtitle?: string;
   code: string;
   version: string;
   year: string;
   pages: number;
+  isSipocMatrix?: boolean;
+  sipocColumns?: string[];
+  sipocRows?: SipocRow[];
   emite?: { name: string; date: string };
   revisa?: { name: string; date: string };
   aprueba?: { name: string; date: string };
@@ -232,8 +250,239 @@ export const POE_OP_001_DATA: OfficialDocumentData = {
   ],
 };
 
+export const SIPOC_E2E_TVAP_DATA: OfficialDocumentData = {
+  title: "PUERTO COLUMBO - MATRIZ SIPOC END-TO-END TVAP",
+  subtitle: "Mapeo de Proveedores, Insumos, Procesos, Entregables y Clientes Internos por Módulo Operativo",
+  code: "SIPOC-TVAP",
+  version: "",
+  year: "",
+  pages: 1,
+  isSipocMatrix: true,
+  sipocColumns: [
+    "ID",
+    "Fase Cadena de Valor",
+    "Módulo / Área",
+    "Proveedor Interno / Ext.",
+    "Entregable de Entrada (Input)",
+    "Proceso / Actividad Clave",
+    "Entregable de Salida (Output)",
+    "Cliente Interno / Ext.",
+    "Sistema / Soporte (XPS)",
+    "SLA Objetivo",
+    "Punto de Fricción / Riesgo",
+  ],
+  sipocRows: [
+    {
+      id: 1,
+      fase: "1. Planificación y Arribo",
+      modulo: "Comercial & Pricing",
+      proveedor: "Gerencia Comercial / FFWW / Clientes",
+      input: "Tarifas, rebates, condiciones de pago, volumen y acuerdos comerciales cargados en XPS",
+      proceso: "Evaluación de margen (≥40%), creación de tipo de cliente en BD y carga de tarifas en XPS.",
+      output: "Tarifas y Acuerdos Comerciales registrados en XPS.",
+      cliente: "Customer Service, Control Documentos, Facturación.",
+      sistema: "XPS Módulo Comercial",
+      sla: "< 24 hrs post-solicitud",
+      riesgo: "Inconsistencia entre tarifas acordadas y cargadas en XPS.",
+    },
+    {
+      id: 2,
+      fase: "1. Planificación y Arribo",
+      modulo: "Customer Service (CS)",
+      proveedor: "Cliente / Agente de Aduana / FFWW",
+      input: "Solicitud de servicio (email/portal), BL, Booking, Free Days.",
+      proceso: "Confirmación de requerimientos, creación y formalización de Orden de Servicio (OS) en XPS.",
+      output: "Creación Orden de Servicio (OS) electrónica habilitada, para servicio comercial. En el caso de carga primaria se verifica (edita) OS.",
+      cliente: "Control Documentos, Porteo, CFS, Bodega.",
+      sistema: "XPS Módulo CS / Portal",
+      sla: "< 30 min por solicitud",
+      riesgo: "Información incompleta de carga o aviso tardío del cliente. Lo anterior genera problema en la programación del servicio y/o errores en la facturación",
+    },
+    {
+      id: 3,
+      fase: "1. Planificación y Arribo",
+      modulo: "Control Documentos",
+      proveedor: "Puertos (TPSV/TPV) / Aduana / CS",
+      input: "Planificación naviera, Manifiesto de Aduana, OS.",
+      proceso: "Verificación naviera, apertura B/L masters, generación de Providencias y segregación.",
+      output: "Manifiesto oficializado, Listado Segregación, Providencias.",
+      cliente: "Almacén Patio, CFS, Gate Control, AGA.",
+      sistema: "XPS Sis. Documental / Aduana",
+      sla: "< 48 hrs previa faena",
+      riesgo: "Aclaraciones tardías de manifiesto o falta de providencia aduanera.",
+    },
+    {
+      id: 4,
+      fase: "2. Ingreso y Porteo",
+      modulo: "Acceso",
+      proveedor: "Transportista Externo / Almacén Patio",
+      input: "Camión posicionado, Guía de despacho, Asignación horario de retiro",
+      proceso: "Control de flujo en antepuerto, validación inicial de cita y asignación de turno.",
+      output: "Turno de acceso habilitado en puerto.",
+      cliente: "Gate Control",
+      sistema: "XPS / OCR",
+      sla: "< 15 min en espera",
+      riesgo: "Congestionamiento vial en antepuerto y verificación manual de patentes, accidente en ruta",
+    },
+    {
+      id: 5,
+      fase: "2. Ingreso y Porteo",
+      modulo: "Gate Control",
+      proveedor: "Transportista",
+      input: "Camión en Gate, EIR, Guía de despacho, Cédula / Identifica.",
+      proceso: "Inspección física (sellos/daños), registro de Gate In en XPS.",
+      output: "Registro Gate In / PR preliminar / planilla de control",
+      cliente: "Jefe de patio / Almacén Patio",
+      sistema: "XPS Gate / OCR",
+      sla: "< 20 min por camión",
+      riesgo: "Alertas OCR por superar límite de 20 min .",
+    },
+    {
+      id: 6,
+      fase: "3. Almacenaje y Patio",
+      modulo: "Almacén Patio / Jefe de Patio",
+      proveedor: "Gate Control / Coordinador Porteo",
+      input: "Registro Gate In, Secuencia de entrega de puerto/Correo",
+      proceso: "Asignación de zona acopio, actualización de planilla de control y coordinación con Reach Stacker.",
+      output: "Ubicación física en planilla de control",
+      cliente: "Operador Reach Stacker / Almacén Patio (Reefer)",
+      sistema: "XPS Control Room / Planilla de Control",
+      sla: "Inmediato post-Gate In",
+      riesgo: "Descalce entre posición registrada en planilla de control y ubicación física real.",
+    },
+    {
+      id: 7,
+      fase: "3. Almacenaje y Patio",
+      modulo: "Patio (Reach Stacker)",
+      proveedor: "Almacenaje Patio/Gate Control",
+      input: "Solicitud de posicionamiento / Planilla de Control/Correo",
+      proceso: "Traslado, apilamiento y posicionamiento físico de contenedor en patio de acopio.",
+      output: "Contenedor ubicado y confirmado en patio.",
+      cliente: "Almacén Patio",
+      sistema: "Planilla de Control",
+      sla: "< 15 min por movimiento",
+      riesgo: "Disponibilidad de maquinaria en horas pico y cálculo erróneo de manipuleos.",
+    },
+    {
+      id: 8,
+      fase: "3. Almacenaje y Patio",
+      modulo: "Área Reefer",
+      proveedor: "Gate Control / Control Documento / Almacén Patio/CS",
+      input: "Contenedor Reefer posicionado.",
+      proceso: "Conexión eléctrica, monitoreo continuo de temperatura y desconexión en XPS.",
+      output: "Planilla de monitoreo / Registro de desconexión en XPS.",
+      cliente: "Customer Service/Control Documento",
+      sistema: "XPS Patio Actividades Reefer",
+      sla: "Conexión < 10 min",
+      riesgo: "Fallas en tomas eléctricas u omisión de registro de fin de conexión en XPS.",
+    },
+    {
+      id: 9,
+      fase: "4. Faenas CFS & Bodega",
+      modulo: "CFS (Desconsolidado)",
+      proveedor: "Almacenaje Patio /Customer Service/ Control Documentos",
+      input: "Contenedor posicionado, OS, Providencia Aduanera.",
+      proceso: "Apertura de contenedor, desconsolidación, grabación/fotografía y Tarja Electrónica.",
+      output: "Tarja Electrónica en XPS / Notificación a FFWW.",
+      cliente: "Bodega / Control Documentos / Customer Service/ FFWW",
+      sistema: "XPS CFS / Tarja Electrónica",
+      sla: "< 24 hrs post-arribo",
+      riesgo: "Cortes rígidos de turno (14:30/16:30) y bultos ciegos o dañados sin pauta.",
+    },
+    {
+      id: 10,
+      fase: "4. Faenas CFS & Bodega",
+      modulo: "CFS (Consolidado)",
+      proveedor: "Customer Service / Bodega",
+      input: "Carga en bodega, Booking, DUS, Providencia Consolidado.",
+      proceso: "Estibado de carga, colocación de sello Columbo, pesaje VGM e inscripción en TPS/SILOGPORT.",
+      output: "Contenedor consolidado / Tarja de Consolidado",
+      cliente: "Almacén Patio /Customer Service",
+      sistema: "XPS CFS / TPS / SILOGPORT",
+      sla: "Según ventana Stacking",
+      riesgo: "Rechazos en puerto por falta de visación previa o discrepancia en sello.",
+    },
+    {
+      id: 11,
+      fase: "4. Faenas CFS & Bodega",
+      modulo: "CFS( Retiro Vacios)",
+      proveedor: "Customer Service",
+      input: "OS",
+      proceso: "Coordinar retiro de Contendor vacío",
+      output: "Contenedor vacio recepcionado para retirar",
+      cliente: "Transportista / Cliente Final",
+      sistema: "XPS/ Pag de depósitos",
+      sla: "< 24 hrs post-Solicitud de Servicio",
+      riesgo: "",
+    },
+    {
+      id: 12,
+      fase: "4. Faenas CFS & Bodega",
+      modulo: "Almacén Bodega",
+      proveedor: "CFS",
+      input: "Carga desconsolidada / Carga recibida por camión.",
+      proceso: "Almacenamiento, paletizado y resguardo en bodega",
+      output: "Papeleta de Recepción (PR) / Ubicación en Bodega.",
+      cliente: "Control Documentos / Customer Service / Cliente",
+      sistema: "XPS Bodega / Recepción no man.",
+      sla: "Inmediato post-tarja",
+      riesgo: "Saturación de capacidad cubierta y demoras en picking recepción indirecto.",
+    },
+    {
+      id: 13,
+      fase: "4. Faenas CFS & Bodega",
+      modulo: "Almacén Bodega",
+      proveedor: "CFS /Customer Service",
+      input: "Carga en bodega",
+      proceso: "picking de carga y cubicación (m^3)",
+      output: "Papeleta de Entrega (PE)",
+      cliente: "Control Documentos / Customer Service / Transportista",
+      sistema: "XPS Bodega / Despacho carga suelta",
+      sla: "< 24 hrs post-Solicitud de Servicio",
+      riesgo: "Cuando no se planifica con anticipación.",
+    },
+    {
+      id: 14,
+      fase: "5. Despacho y Salida",
+      modulo: "Gate Out",
+      proveedor: "Transportista",
+      input: "Camión Cargado / PE / Guía Despacho",
+      proceso: "Validación documental final, y revisión físca contenedor",
+      output: "Registro Gate Out",
+      cliente: "Transportista / Cliente Final",
+      sistema: "XPS Gate Out",
+      sla: "< 5 min por camión",
+      riesgo: "Demoras en revisión física y documental",
+    },
+    {
+      id: 15,
+      fase: "5. Despacho y Salida",
+      modulo: "CS / Control Docs",
+      proveedor: "CFS / Bodega /Almacén Patio/ CS/Pricing",
+      input: "Tarja Conforme / Servicios Realizados/Acuerdo Comercial Creado y aprobado(Pricing)",
+      proceso: "Liquidación de tarifas, visación final y facturación",
+      output: "Proforma(CS)/Factura emitida",
+      cliente: "Cliente",
+      sistema: "XPS Facturación / ERP",
+      sla: "< 48 hrs. ( Control Doc.) menos de 5 días CS",
+      riesgo: "Bloqueos por diferendos comerciales o falta de pago",
+    },
+  ],
+  objeto: "",
+  campoAplicacion: "",
+  normasReferencias: "",
+  definiciones: "",
+  responsabilidades: [],
+  etapas: [],
+  anexos: "",
+  controlCambios: [],
+};
+
 export function getOfficialDocumentData(codeOrUrl?: string): OfficialDocumentData {
   const norm = (codeOrUrl || '').toLowerCase();
+  if (norm.includes('sipoc') || norm.includes('tvap')) {
+    return SIPOC_E2E_TVAP_DATA;
+  }
   if (
     norm.includes('poe') || 
     norm.includes('arriendo') || 
@@ -246,6 +495,126 @@ export function getOfficialDocumentData(codeOrUrl?: string): OfficialDocumentDat
 }
 
 export function downloadOfficialDocument(data: OfficialDocumentData = PTS_SGI_009_DATA) {
+  if (data.isSipocMatrix && data.sipocColumns && data.sipocRows) {
+    const sipocHtml = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>${data.title}</title>
+  <style>
+    @page { size: A4 landscape; margin: 10mm; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111827;
+      background: #ffffff;
+      margin: 0;
+      padding: 20px;
+    }
+    .sheet {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #ffffff;
+    }
+    .doc-title {
+      color: #1B365D;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 0 4px 0;
+      letter-spacing: 0.2px;
+    }
+    .doc-subtitle {
+      color: #4B5563;
+      font-size: 11px;
+      font-style: italic;
+      margin: 0 0 14px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+    th {
+      background-color: #1B365D;
+      color: #ffffff;
+      font-weight: bold;
+      text-align: center;
+      padding: 7px 6px;
+      border: 1px solid #1B365D;
+      vertical-align: middle;
+    }
+    td {
+      border: 1px solid #CBD5E1;
+      padding: 6px;
+      vertical-align: middle;
+      text-align: left;
+      color: #111827;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #F8FAFC;
+    }
+    td.col-id {
+      text-align: center;
+      font-weight: bold;
+      width: 28px;
+    }
+    td.col-fase {
+      font-weight: bold;
+    }
+    @media print {
+      body { padding: 0; }
+      table { font-size: 8.5px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <h1 class="doc-title">${data.title}</h1>
+    <p class="doc-subtitle">${data.subtitle || ''}</p>
+    <table>
+      <thead>
+        <tr>
+          ${data.sipocColumns.map((col) => `<th>${col}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${data.sipocRows
+          .map(
+            (row) => `
+          <tr>
+            <td class="col-id">${row.id}</td>
+            <td class="col-fase">${row.fase}</td>
+            <td>${row.modulo}</td>
+            <td>${row.proveedor}</td>
+            <td>${row.input}</td>
+            <td>${row.proceso}</td>
+            <td>${row.output}</td>
+            <td>${row.cliente}</td>
+            <td>${row.sistema}</td>
+            <td>${row.sla}</td>
+            <td>${row.riesgo}</td>
+          </tr>
+        `
+          )
+          .join('')}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([sipocHtml], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Matriz_SIPOC_E2E_Puerto_Columbo_TVAP.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return;
+  }
+
   const isPoe = data.code.includes('POE') || data.pages === 6;
 
   const signaturesHtml = isPoe

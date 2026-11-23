@@ -18,8 +18,8 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
   const [isLoading, setIsLoading] = useState(true);
 
   const isInternalDoc = 
-    Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009') || code.includes('POE'))) ||
-    Boolean(url && (url.includes('pts-sgi-009') || url.includes('poe-op-001') || url.startsWith('#doc-')));
+    Boolean(code && (code.includes('PTS-SGI-009') || code.includes('PTS- SGI-009') || code.includes('POE') || code.includes('SIPOC'))) ||
+    Boolean(url && (url.includes('pts-sgi-009') || url.includes('poe-op-001') || url.includes('sipoc') || url.startsWith('#doc-')));
 
   const officialDocData = isInternalDoc ? getOfficialDocumentData(code || url || '') : null;
 
@@ -91,7 +91,7 @@ export function PreviewModal({ url, title, category, code, onClose, onToast }: P
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 10 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-5xl h-[88vh] bg-white rounded-2xl shadow-2xl border border-slate-200/80 flex flex-col overflow-hidden z-10"
+          className={`relative w-full ${officialDocData?.isSipocMatrix ? 'max-w-7xl' : 'max-w-5xl'} h-[88vh] bg-white rounded-2xl shadow-2xl border border-slate-200/80 flex flex-col overflow-hidden z-10`}
         >
           {/* Executive Header */}
           <div className="px-5 py-4 bg-gradient-to-r from-[#00264A] to-[#003B6F] text-white flex items-center justify-between gap-4 shrink-0 border-b border-sky-900/40">

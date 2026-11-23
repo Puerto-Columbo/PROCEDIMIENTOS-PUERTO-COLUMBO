@@ -26,7 +26,8 @@ export function OfficialDocumentViewer({ documentData, code, url, onToast }: Off
   const [zoomLevel, setZoomLevel] = useState<number>(100);
   const data = documentData || getOfficialDocumentData(code || url);
   const totalPages = data.pages || 6;
-  const isPoe = data.code.includes('POE') || totalPages === 6;
+  const isSipoc = Boolean(data.isSipocMatrix && data.sipocRows);
+  const isPoe = !isSipoc && (data.code.includes('POE') || totalPages === 6);
 
   const handlePrint = () => {
     window.print();
@@ -118,11 +119,86 @@ export function OfficialDocumentViewer({ documentData, code, url, onToast }: Off
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-8 flex flex-col items-center">
         {/* Style applied when zoomed */}
         <div 
-          className="w-full max-w-4xl space-y-8 transition-transform origin-top"
+          className={`w-full ${isSipoc ? 'max-w-[1320px]' : 'max-w-4xl'} space-y-8 transition-transform origin-top`}
           style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
         >
 
-          {isPoe ? (
+          {isSipoc ? (
+            /* =========================================================================
+               DOCUMENTO OFICIAL: MATRIZ SIPOC END-TO-END TVAP
+               ========================================================================= */
+            <div className="bg-white rounded-lg shadow-xl border border-slate-300 p-6 sm:p-10 text-slate-900">
+              <div className="mb-4">
+                <h1 className="text-base sm:text-lg font-bold text-[#1B365D] tracking-tight uppercase">
+                  {data.title}
+                </h1>
+                {data.subtitle && (
+                  <p className="text-[11px] sm:text-xs italic text-slate-600 mt-0.5">
+                    {data.subtitle}
+                  </p>
+                )}
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-slate-300 text-[10px] sm:text-[11px] leading-snug">
+                  <thead>
+                    <tr className="bg-[#1B365D] text-white">
+                      {data.sipocColumns?.map((col, idx) => (
+                        <th
+                          key={idx}
+                          className="border border-[#1B365D] px-2 py-2.5 text-center font-bold align-middle"
+                        >
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.sipocRows?.map((row, rIdx) => (
+                      <tr
+                        key={row.id}
+                        className={rIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50/80'}
+                      >
+                        <td className="border border-slate-300 px-2 py-2 text-center font-bold align-middle">
+                          {row.id}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 font-bold align-middle">
+                          {row.fase}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.modulo}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.proveedor}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.input}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.proceso}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.output}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.cliente}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.sistema}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.sla}
+                        </td>
+                        <td className="border border-slate-300 px-2 py-2 align-middle">
+                          {row.riesgo}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : isPoe ? (
             /* =========================================================================
                DOCUMENTO OFICIAL: POE- OP-001 (PROCEDIMIENTO ARRIENDO CONTENEDORES)
                ========================================================================= */
